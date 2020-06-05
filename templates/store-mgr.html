@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<title>Home</title>
+
+	<script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+	</script>
+
+	<script>
+		function cross(x) {
+		x.classList.toggle("change");
+		}
+	</script>
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+    	<!-- <a><i class="fas fa-home"></i><a -->
+    	<!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->	
+    	<a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
+		<a href="#" >Add Category</a>
+		<a href="#">Issued Items</a>
+		<a href="#">All Items</a>
+		<a href="#">Critical / Low Items</a>
+		<a href="#">Requests</a>
+		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<!-- <i class="fa fa-bars"></i> -->
+
+		<div class="container" onclick="cross(this)">
+			<div class="bar1"></div>
+			<div class="bar2"></div>
+			<div class="bar3"></div>
+		</div>
+
+		</a>
+		<div class="topnav-right">
+			<a href="#">Logout</a>
+			<a href="#">Update</a>
+			<!-- <a href="#">Settings</a> -->
+		</div>
+	</div>
+
+    <div class="wrapper">
+        <div class="title">
+        	<span>
+            Inventory Management
+            System <br>
+            Store Manager<br>
+            Dashboard
+            </span>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+		<script>
+			swal("{{ message }}", "",'{{alert_type}}' );
+		</script>
+
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+        
+        <div class="form">
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
+			<h1>Add New Category</h1>
+            
+            <form action="/addnewcategory" method="POST">
+				<div>
+					<input type="text" name="Newcat" placeholder="Category Name" required><br>
+				</div>
+				<div class="cat-box">
+					<p>Category Type:</p>
+					<div class="cat-radio-btn">
+						<input type="radio" id="Nonconsumable" name="Cattype" value="Non-consumable">
+						<label for="Nonconsumable">Non Consumable</label>
+						<input type="radio" id="Consumable" name="Cattype" value="Consumable">
+						<label for="Consumable">Consumable</label><br>
+					</div>
+				</div>
+				<div>
+					<input type="digit" name="Lowlevel" placeholder="Set Low Level Quantity" required><br>
+				</div>
+
+				<div>
+					<input type="digit" name="Crilevel" placeholder="Set Critical Level Quantity" required><br>
+				</div>
+
+				<div class="generate-code-btn">
+            		<!-- <div>
+						<input type="text" name="FirstName" placeholder="First Name" required><br>
+					</div> -->
+					<div>
+						<button type="submit" id = "generate-code-btn" name="Generate Code" >Generate Code</button>
+					</div>
+					<div>
+						<input type="digit" id = "Unique_code" name="Catcode" placeholder="New Category Code" required><br>
+					</div>
+				</div>
+				<!-- <div>
+					<button type="button" name="Generate Code">Generate Code</button>
+					<input type="digit" name="catcode" placeholder="New Category Code" required><br>
+				</div> -->
+				<div class="add-btn">
+					<button>Add</button>
+				</div>
+				<!-- <div class="pre-account">
+					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
+				</div> --> 
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+		document.querySelector("#generate-code-btn").addEventListener('click', (event) => {
+		event.preventDefault();
+		uniqueCode();
+		});
+
+		function uniqueCode(){
+		  var fourdigitsrandom = Math.floor(1000 + Math.random() * 9000);
+		  document.getElementById("Unique_code").value=fourdigitsrandom;
+		 } 
+	</script>
+
+</body>
+</html>

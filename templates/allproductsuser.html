@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PROXY TAG FOR PASSING JINJA VARIABLE TO JAVASCRIPT FUNCTION -->
+    <meta id="qty_available" data-qty_available="{{ qty_available }}">
+    <!-- PROXY TAG ENDS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- JAVASCRIPT LINK FOR TOOLTIP TEXT STARTS -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> --> 
+    <!-- JAVASCRIPT LINK FOR TOOLTIP TEXT ENDS -->
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <!-- Adding Bootstrap Links -->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap Links Ends  -->
+
+    <title>Home</title>
+
+    <script>
+        function myFunction() {
+          var x = document.getElementById("myTopnav");
+          if (x.className === "topnav") {
+            x.className += " responsive";
+          } else {
+            x.className = "topnav";
+          }
+        }
+    </script>
+
+    <script>
+        function cross(x) {
+        x.classList.toggle("change");
+        }
+    </script>
+
+    <!-- THIS IS THE JAVASCRIPT FOR THE FORM FOR SUBMITTING REQUIRED QUANTITY -->
+    <script type="text/javascript">
+        function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+        }
+
+        function sendItemId(item_id) {
+        document.querySelector("#receive_item_id").value =  item_id;
+        }
+
+        // function myFunction() {
+        // var x = document.getElementById("requested_qty").value;
+        // var qty_available = querySelector('#qty_available').data("qty_available");
+        // if (x > qty_available) {
+        //     alert("'Requested quantity can not be more than Available quantity!")
+        // }
+        // }
+
+    </script>
+    <!-- jAVASCRIPT FOR FORM ENDS -->
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", getEmailOrPhone);
+        function getEmailOrPhone(){
+            var email_Or_Phone = localStorage.getItem("email_Or_Phone")
+            document.querySelector("#receive_email_or_phone").value= email_Or_Phone  
+            document.querySelector("#user_email_or_phone").value= email_Or_Phone    
+        }   
+    </script>
+    <script type="text/javascript">
+        function submitForm(form_action){
+            document.getElementById("requesteditems").action = form_action;
+            document.getElementById("requesteditems").submit();
+        }
+    </script>
+    <script type="text/javascript">
+        function redirectHome(){
+            document.getElementById("homeredirectform").submit();
+        }
+    </script>
+    
+    
+ 
+
+    <!-- JAVASCRIPT FOR TOOLTIP TEXT BEGINS -->
+
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function(){
+              $('[data-toggle="tooltip"]').tooltip();   
+            });
+        </script> -->
+
+    <!-- JAVASCRIPT FOR TOOLTIP TEXT ENDS -->
+
+    <!-- CSS FOR TOOLTIP TEXT BEGINS -->
+
+    <!-- <style>
+      /* Tooltip */
+      .test + .tooltip > .tooltip-inner {
+        background-color: #333; 
+        color: #FFFFFF; 
+        border: 1px solid green; 
+        padding: 5px;
+        font-size: 15px;
+      }
+
+      /* Tooltip on bottom */
+      .test + .tooltip.bottom > .tooltip-arrow {
+        border-bottom: 5px solid black;
+      }
+
+    </style> --> 
+
+    <!-- CSS FOR TOOLTIP TEXT ENDS -->
+
+</head>
+
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <!-- <a><i class="fas fa-home"></i><a -->
+        <!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->   
+        <a class="active" href="#" onclick="redirectHome()"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href = '#' onclick="submitForm('/userrequesteditems')">Requested Items</a>
+        <a href = '#' onclick="submitForm('/userissueditems')">Issued Items</a>
+        <a href = '#' onclick="submitForm('/userreturneditems')">Returned Items</a>
+        <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <!-- <i class="fa fa-bars"></i> -->
+
+        <div class="container" onclick="cross(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        </a>
+        <div class="topnav-right">
+            <a href="#">Logout</a>
+            <a href="/updatepassword">Update</a>
+            <a href=""><i class="fa fa-fw fa-bell-on"></i></a>
+            <!-- <a href="#">Settings</a> -->
+        </div>
+    </div>
+
+    <style>
+        #customers {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #customers td,
+        #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #customers tr:hover {
+            background-color: #ddd;
+        }
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #333;
+            color: white;
+        }
+
+        h1{
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        swal("{{ message }}", "",'{{alert_type}}' );
+    </script>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <center>
+        <h1>These are all the items available in the Store </h1>
+        <div style="overflow-x:auto;">
+            <table id="customers">
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Product Code</th>
+                    <th>Quantity Available</th>
+                    <th>Product Type</th>
+                    <th>Lowlevel Qty.</th>
+                    <th>Critical Level Qty.</th>
+                    <th style="text-align: right;">Add or Remove Items</th>
+                    
+                </tr>
+                {% if all_products %}
+                {% for item in all_products %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.product_code }}</td>
+                    <td>{{ item.qty_available }}</td>
+                    <td>{{ item.product_type }}</td>
+                    <td>{{ item.lowlevel_qty }}</td>
+                    <td>{{ item.critical_level_qty }}</td>
+                    <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
+                    <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                No results found
+                {% endif %}
+
+                <!-- <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
+                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
+                </tr>
+
+                <tr>
+                    <td>A</td>
+                    <td>B</td>
+                    <td>C</td>
+                    <td>D</td>
+                    <td>E</td>
+                    <td>F</td>
+                    <td>G</td>
+                    <td>H</td>
+                    <td>I</td>
+                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
+                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
+                </tr>
+
+                <tr>
+                    <td>11</td>
+                    <td>12</td>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                    <td>16</td>
+                    <td>17</td>
+                    <td>18</td>
+                    <td>19</td>
+                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
+                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
+                </tr>
+
+                <tr>
+                    <td>AA</td>
+                    <td>BB</td>
+                    <td>CC</td>
+                    <td>DD</td>
+                    <td>EE</td>
+                    <td>FF</td>
+                    <td>GG</td>
+                    <td>HH</td>
+                    <td>II</td>
+                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
+                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
+                </tr> -->
+
+            </table>
+        </div>
+    </center>
+
+
+        <div class="form-popup form" id="myForm">
+          <form action="/addrequest" class="form-container" method="POST">
+            <!-- <h1>Login</h1> -->
+
+            <label for="quantity" style="font-size: 22px;"><b><u>Quantity</u></b></label>
+            <input id = "requested_qty" type="text" placeholder="Enter Required Quantity" name="Quantity" required>
+
+            <!-- ONLY REPLACE THE ABOVE QUANTITY INPUT FIELD WITH THIS TOOLTIP INPUT FIELD IF ERRORS CAN BE CORRECTED -->
+            <!-- <a class="test"  data-toggle="tooltip" data-placement="bottom" title="Enter Quantity less than available quantity!"> 
+                <input id = "requested_qty" type="text" placeholder="Enter Required Quantity" name="Quantity" required>
+            </a> -->
+
+            <!-- COMMENT FOR "Quantity" INPUT FIELD ENDS -->
+            <input id = "receive_item_id" type="hidden" name="product_id">
+
+            <!-- INPUT FIELDS CONTAINING USER CREDENTIALS -->
+            <input type = "hidden" name="first_name"  value="{{ first_name }}">
+            <input type = "hidden" name="last_name"  value="{{ last_name }}">
+            <input type = "hidden" name="department"  value="{{ department }}">
+            <input type = "hidden" name="registered_as"  value="{{ registered_as }}">
+            <!-- INPUT FIELD ENDS -->
+
+            <div class = "signup-btn" style="text-align: left;">
+                <button type="submit" class="" style="font-size: 13px;">Ok</button>
+                <button type="button" class=""  style="font-size: 13px;" onclick="closeForm()">Close</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER--IMPORTANT FORM -->
+        <form id="requesteditems" method="POST" style="display: none;">       
+            <div>
+                <input id = "receive_email_or_phone" type="hidden" name="email_Or_Phone" readonly>
+            </div>
+        </form>
+
+        <!-- THIS FORM IS USED TO SEND USER ID TO BE USED WHEN REDIRECTING TO HOME i.e. ALLPRODUCTSUSER.HTML FROM OTHER PAGES SUCH AS ISSUED ITEMS AND OTHERS -->
+        <form action = "/homeredirect" id="homeredirectform" method="POST" style="display: none;">       
+            <div>
+                <input id = "user_email_or_phone" type = "hidden" name="user_email_or_phone">
+            </div>
+        </form>
+
+</body>
+
+</html>

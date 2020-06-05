@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<title>Home</title>
+
+	<script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+	</script>
+
+	<script>
+		function cross(x) {
+		x.classList.toggle("change");
+		}
+	</script>
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+    	<!-- <a><i class="fas fa-home"></i><a -->
+    	<!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->	
+    	<a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
+		<a href="#">All Items</a>
+		<a href="#">Request Items</a>
+		<a href="#">Issued Items</a>
+		<a href="#">Requested Items</a>
+		<a href="#">Returned Items</a>
+		<!-- <a href="#">Requests</a> -->
+		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<!-- <i class="fa fa-bars"></i> -->
+
+		<div class="container" onclick="cross(this)">
+			<div class="bar1"></div>
+			<div class="bar2"></div>
+			<div class="bar3"></div>
+		</div>
+
+		</a>
+		<div class="topnav-right">
+			<a href="#">Logout</a>
+			<a href="#">Update</a>
+			<!-- <a href="#">Settings</a> -->
+		</div>
+	</div>
+
+    <div class="wrapper">
+        <div class="title">
+        	<span>
+            Inventory Management
+            System <br>
+            Faculty<br>
+            Dashboard
+            </span>
+        </div>
+        <div class="form">
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
+			<h1>Add Items</h1>
+            
+            <form action="/savedata" method="POST">
+            	<div class="name">
+            		<div>
+						<input type="text" name="FirstName" placeholder="First Name" required><br>
+					</div>
+					<div>
+						<input type="text" name="LastName" placeholder="Last Name" required><br>
+					</div>
+				</div>
+				<div>
+					<input type="text" name="Dept" placeholder="Enter your Department Name" required><br>
+				</div>
+				<div>
+					<input type="text" name="Email" placeholder="Enter your email Address" required><br>
+				</div>
+				<div>
+					<input type="digit" name="Phone" placeholder="Enter your Phone Number" required><br>
+				</div>
+				<div>
+					<input type="password" name="password" placeholder="Enter your New password" required><br>
+				</div>
+				<div>
+					<input type="password" name="cpassword" placeholder="Confirm password" required><br>
+				</div>
+				<div class="signup-btn">
+					<button>Add</button>
+				</div>
+				<!-- <div class="pre-account">
+					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
+				</div> --> 
+            </form>
+        </div>
+    </div>
+</body>
+</html>

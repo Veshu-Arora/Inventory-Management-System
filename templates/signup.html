@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<title>Home</title>
+
+	<!-- <script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+		</script> -->
+
+		<!-- <script type="text/javascript">
+			document.querySelector("#receive_designation").value = localStorage.getItem("designation")
+		</script> -->
+
+		<script type="text/javascript">
+			document.addEventListener("DOMContentLoaded", getDesignation);
+			function getDesignation(){
+				var designation = localStorage.getItem("designation")
+				document.querySelector("#designation_here").innerHTML = designation
+				document.querySelector("#receive_designation").value = designation	
+			}
+			
+		</script>
+</head>
+
+<body>
+    <!-- <div class="topnav" id="myTopnav">
+		<a href="/enter" >Enter Student Record</a>
+		<a href="/payfees">Pay Mess Fee</a>
+		<a href="/paydue">Pay Due</a>
+		<a href="/transaction">Transactions</a>
+		<a href="/students">Student Records</a>
+		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<i class="fa fa-bars"></i>
+		</a>
+	</div> -->
+
+    <div class="wrapper">
+        <div class="title">
+        	<span>
+            Inventory Management
+            System <br>
+            <span id = 'designation_here'></span><br>
+            Signup
+            </span>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+		<script>
+			swal("{{ message }}", "",'{{alert_type}}' );
+		</script>
+
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+
+        <div class="form">
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
+			<h1>Enter Your Details</h1>
+            
+            <form action="/newregistration" method="POST">
+            	<div class="name">
+            		<div>
+						<input type="text" name="FirstName" placeholder="First Name" required><br>
+					</div>
+					<div>
+						<input type="text" name="LastName" placeholder="Last Name" required><br>
+					</div>
+				</div>
+
+				<div class="department-options">
+					<select name="department_id" id="" required>
+						{% for key, value in department.items() %}
+							<option value="{{key}}">{{value}}</option><br>
+						{% endfor %}	
+					</select>
+				</div>
+
+				<!-- <div>
+					<input type="text" name="Dept" placeholder="Enter your Department Name" required><br>
+				</div> -->
+				<div>
+					<input type="text" name="Email" placeholder="Enter your email Address" required><br>
+				</div>
+				<div>
+					<input type="digit" name="Phone" placeholder="Enter your Phone Number" required><br>
+				</div>
+				<div>
+					<input type="password" name="Password" placeholder="Enter your New password" required><br>
+				</div>
+				<div>
+					<input type="password" name="CPassword" placeholder="Confirm password" required><br>
+				</div>
+				<div>
+					 <input id = "receive_designation" type = "hidden" name="Designation" readonly>
+				</div>
+				<div class="signup-btn">
+					<button>Signup</button>
+				</div>
+				<div class="pre-account">
+					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
+				</div>
+				<div>
+				
+				</div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

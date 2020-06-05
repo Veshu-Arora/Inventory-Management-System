@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<title>Home</title>
+
+	<!-- CSS FOR LABEL -->
+
+	<style type="text/css">
+		.label {
+			margin-top: 120px;
+			color: white;
+			padding:2px 15px 2px 15px;
+			outline: none;
+			font-family: 'Poiret One', cursive;
+		}
+
+		.other {
+			background-color: #696969;
+			color: white;
+			border-radius: 10px;
+		}
+
+		.form h1 {
+			margin-bottom: 20px;
+		}
+
+	</style>
+
+	<!-- CSS FOR LABEL ENDS -->
+
+
+
+	<script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+	</script>
+
+	<script>
+		function cross(x) {
+		x.classList.toggle("change");
+		}
+	</script>
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+    	<!-- <a><i class="fas fa-home"></i><a -->
+    	<!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->	
+    	<a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
+		<a href="#" >Add Category</a>
+		<a href="#">Issued Items</a>
+		<a href="#">All Items</a>
+		<a href="/criticalitems">Critical Items</a>
+		<a href="/lowitems">Low Items</a>
+		<a href="#">Requests</a>
+		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<!-- <i class="fa fa-bars"></i> -->
+
+		<div class="container" onclick="cross(this)">
+			<div class="bar1"></div>
+			<div class="bar2"></div>
+			<div class="bar3"></div>
+		</div>
+
+		</a>
+		<div class="topnav-right">
+			<a href="#">Logout</a>
+			<a href="#">Update</a>
+			<!-- <a href="#">Settings</a> -->
+		</div>
+	</div>
+
+    <div class="wrapper">
+        <div class="title">
+        	<!-- <span>
+            Inventory Management
+            System <br>
+            Faculty<br>
+            Signup
+            </span> -->
+            <p>
+            Add Products
+            To <br>
+            Database<br>
+            </p>
+
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+		<script>
+			swal("{{ message }}", "",'{{alert_type}}' );
+		</script>
+
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+        
+        <div class="form">
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
+			<h1>Enter Product Details</h1>
+            
+            <form action="/addnewproduct" method="POST">
+
+				<div class="product-options">
+
+					<span class="label other">Select Product Category</span>
+
+					<select name="product_items_id" id="" required>
+						{% for key, value in category_items.items() %}
+							<option value="{{key}}">{{value}}</option><br>
+						{% endfor %}	
+					</select>
+
+				</div>
+
+				<div>
+					<input type="text" name="Quantity" placeholder="Enter the product Quantity" ><br>
+				</div>
+				<!-- <div>
+					<input type="text" name="Email" placeholder="Enter your email Address" required><br>
+				</div>
+				<div>
+					<input type="digit" name="Phone" placeholder="Enter your Phone Number" required><br>
+				</div>
+				<div>
+					<input type="password" name="password" placeholder="Enter your New password" required><br>
+				</div>
+				<div>
+					<input type="password" name="cpassword" placeholder="Confirm password" required><br>
+				</div> -->
+				<div class="signup-btn">
+					<button>Add product</button>
+					<button formaction = "/records" >Add New Category</button>
+					<button formaction="/storemanager">Submit to another page</button>
+				</div>
+
+				<!-- <div class="signup-btn">
+					<button type = "submit" formaction = "/storemanager" >Add New Category</button>
+				</div> -->
+				<!-- <div class="pre-account">
+					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
+				</div> -->
+            </form>
+        </div>
+    </div>
+</body>
+</html>

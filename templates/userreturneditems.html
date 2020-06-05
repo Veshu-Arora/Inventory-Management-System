@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <!-- Adding Bootstrap Links -->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap Links Ends  -->
+
+    <title>Home</title>
+
+    <script>
+        function myFunction() {
+          var x = document.getElementById("myTopnav");
+          if (x.className === "topnav") {
+            x.className += " responsive";
+          } else {
+            x.className = "topnav";
+          }
+        }
+    </script>
+
+    <script>
+        function cross(x) {
+        x.classList.toggle("change");
+        }
+    </script>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", getEmailOrPhone);
+        function getEmailOrPhone(){
+            var email_Or_Phone = localStorage.getItem("email_Or_Phone")
+            document.querySelector("#receive_email_or_phone").value= email_Or_Phone      
+        }   
+    </script>
+    <script type="text/javascript">
+        function submitForm(){
+            document.getElementById("requesteditems").submit();
+        }
+    </script>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", getEmailOrPhone);
+        function getEmailOrPhone(){
+            var email_Or_Phone = localStorage.getItem("email_Or_Phone")
+            document.querySelector("#receive_email_or_phone").value= email_Or_Phone   
+            document.querySelector("#user_email_or_phone").value= email_Or_Phone   
+        }   
+    </script>
+    <script type="text/javascript">
+        function submitForm(form_action){
+            document.getElementById("requesteditems").action = form_action;
+            document.getElementById("requesteditems").submit();
+        }
+    </script>
+    <script type="text/javascript">
+        function redirectHome(){
+            document.getElementById("homeredirectform").submit();
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div class="topnav" id="myTopnav">   
+        <a class="active" href="#" onclick="redirectHome()"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href = '#' onclick="submitForm('/userrequesteditems')">Requested Items</a>
+        <a href = '#' onclick="submitForm('/userissueditems')">Issued Items</a>
+        <a href = '#' onclick="submitForm('/userreturneditems')">Returned Items</a>
+        <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <!-- <i class="fa fa-bars"></i> -->
+
+        <div class="container" onclick="cross(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        </a>
+        <div class="topnav-right">
+            <a href="#">Logout</a>
+            <a href="/updatepassword">Update</a>
+            <a href=""><i class="fa fa-fw fa-bell-on"></i></a>
+            <!-- <a href="#">Settings</a> -->
+        </div>
+    </div>
+
+    <style>
+        #customers {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #customers td,
+        #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #customers tr:hover {
+            background-color: #ddd;
+        }
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #333;
+            color: white;
+        }
+
+        h1{
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        swal("{{ message }}", "",'{{alert_type}}' );
+    </script>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <center>
+        <h1>These are all the Non-Consumable items you returned back to the Store </h1>
+        <div style="overflow-x:auto;">
+            <table id="customers">
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Product Code</th>
+                    <th>Product Type</th>
+                    <th>Requested By</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Requested Qty.</th>
+                    <th>Request Date</th>
+                    <th>Request Status</th>
+                    <th>Issued On</th>
+                    <th>Returned On</th>
+                    <!-- <th style="text-align: right;">Add or Remove Items</th> -->
+                    
+                </tr>
+                {% if returned_items %}
+                {% for item in returned_items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.product_code }}</td>
+                    <td>{{ item.product_type }}</td>
+                    <td>{{ item.requested_by }}</td>
+                    <td>{{ item.department }}</td>
+                    <td>{{ item.designation }}</td>
+                    <td>{{ item.requested_qty }}</td>
+                    <td>{{ item.request_date }}</td>
+                    <td>{{ item.request_status }}</td>
+                    <td>{{ item.product_issued_on }}</td>
+                    <td>{{ item.returned_on }}</td>
+                    <!-- <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
+                    <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td> -->
+                </tr>
+                {% endfor %}
+                {% else %}
+                No results found
+                {% endif %}
+
+            </table>
+        </div>
+    </center>
+
+        <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER--IMPORTANT FORM -->
+        <form id="requesteditems" method="POST" style="display: none;">       
+            <div>
+                <input id = "receive_email_or_phone" type="hidden" name="email_Or_Phone" readonly>
+            </div>
+        </form>
+
+        <!-- THIS FORM IS USED TO SEND USER ID TO BE USED WHEN REDIRECTING TO HOME i.e. ALLPRODUCTSUSER.HTML FROM OTHER PAGES SUCH AS ISSUED ITEMS AND OTHERS -->
+        <form action = "/homeredirect" id="homeredirectform" method="POST" style="display: none;">       
+            <div>
+                <input id = "user_email_or_phone" type = "hidden" name="user_email_or_phone">
+            </div>
+        </form>
+
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'main.css') }}">
+
+	<!-- <script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+	</script> -->
+
+	<script type="text/javascript">
+		function sendDesignation(des){
+			var designation = des;
+			localStorage.setItem("designation", designation);
+			window.document.location = './signup';
+			return false;
+		}
+
+		function openLoginPageWithDesignation(des){
+			var designation = des;
+			localStorage.setItem("designation", designation);
+			window.document.location = './login';
+			return false;
+		}
+	</script>
+
+</head>
+<body>
+
+	<div class="topnav" id="myTopnav">
+		<h2>Inventory  Management  System</h2>
+		<!-- <a href="/enter" >Enter Student Record</a>
+		<a href="/payfees">Pay Mess Fee</a>
+		<a href="/paydue">Pay Due</a>
+		<a href="/transaction">Transactions</a>
+		<a href="/students">Student Records</a>
+		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<i class="fa fa-bars"></i>
+		</a> -->
+	</div>
+
+	<div class="container">
+		
+		<div class="signup">
+			<div class="for-align">
+				<div>
+					<h3>Signup As:</h3>
+				</div>
+				<div class="icons">
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="sendDesignation('Faculty')"></a>
+						<label class="label" id = 'faculty'>Faculty</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="sendDesignation('Lab Assistant')"></a>
+						<label class="label" id = 'lab-assistant'>Lab Assistant</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="sendDesignation('Clerk')"></a>
+						<label class="label" id = 'clerk'>Clerk</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="sendDesignation('Sweeper')"></a>
+						<label class="label" id = 'sweeper'>Sweeper</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="signup">
+			<div class="for-align">
+				<div>
+					<h3>Login As:</h3>
+				</div>
+				<div class="icons">
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="openLoginPageWithDesignation('Faculty')"></a>
+						<label class="label" id = 'faculty'>Faculty</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="openLoginPageWithDesignation('Lab Assistant')"></a>
+						<label class="label" id = 'lab-assistant'>Lab Assistant</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="openLoginPageWithDesignation('Clerk')"></a>
+						<label class="label" id = 'clerk'>Clerk</label>
+					</div>
+					<div class="image">
+						<a href="#"><img src="https://via.placeholder.com/1500" 
+							onclick="openLoginPageWithDesignation('Sweeper')"></a>
+						<label class="label" id = 'sweeper'>Sweeper</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="info" style="background-color: #495057">		
+		<!-- <div class="info" style="background-color: #131A22"> -->
+ 		<!-- <div class="info" style="background-color: #232F3E"> -->
+			<p align="center">ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+		</div>
+
+		<div class="footer" style="background-color: #333">
+<!-- 		<div class="footer" style="background-color: #131A22">
+ -->			<span>Copyright &copy; 2020 DoIT, HNBGU</span>
+		</div>
+
+	</div>
+</body>
+</html>
