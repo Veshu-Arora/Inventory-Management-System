@@ -37,21 +37,37 @@
         }
     </script>
 
+    <!-- THIS IS THE JAVASCRIPT FOR THE FORM FOR SUBMITTING REQUIRED QUANTITY -->
+    <script type="text/javascript">
+        function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+        }
+
+        function sendProductCodeToSetMaxIssuableQty(product_code) {
+        document.querySelector("#receive_product_code_to_set_issuable_qty").value =  product_code;
+        }
+
+    </script>
+    <!-- jAVASCRIPT FOR FORM ENDS -->
+    
 </head>
 
 <body>
 
-    <div class="topnav" id="myTopnav">  
-        <a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="/addcategory" >Add Category</a>
-        <a href="/allcategories">All Categories</a>
-        <a href="/addproduct">Add Product</a>
-        <a href="/issueditems">Issued Items</a>
-        <!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
-        <a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
-        <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
-        <a href="/allrequests">All Requests</a>
+    <div class="topnav" id="myTopnav">   
+        <a class="active" href="/allproductshead"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href = '/allrequestshead'>Requested Items</a>
+        <a href = '/issueditemshead'>Issued Items</a>
+        <a href = '/criticalitemshead'>Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p>
+        </a>
+        <a href = '/lowitemshead'>Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+        <a href = '/returneditemshead'>Returned Items</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <!-- <i class="fa fa-bars"></i> -->
 
         <div class="container" onclick="cross(this)">
             <div class="bar1"></div>
@@ -62,8 +78,8 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="/updatepasswordstoremanager">Update</a>
-            <!-- <a href="#">Settings</a> -->
+            <a href="/updatepasswordhead">Update</a>
+            <!-- <a href=""><i class="fa fa-fw fa-bell-on"></i></a> -->
         </div>
     </div>
 
@@ -115,7 +131,7 @@
     {% endwith %}
 
     <center>
-        <h1>These are all the items below Low level quantity </h1>
+        <h1>These are all the items available in the Store </h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
@@ -126,11 +142,14 @@
                     <th>Product Type</th>
                     <th>Lowlevel Qty.</th>
                     <th>Critical Level Qty.</th>
-                    <!-- <th style="text-align: right;">Add or Remove Items</th> -->
+                    <th>Mark Status</th>
+                    <th>Max Issuable Qty.</th>
+                    <th style="text-align: right;">Mark or Unmark Items</th>
+                    <th style="text-align: right;">Set or Remove Max Issuable Qty.</th>
                     
                 </tr>
-                {% if low_items %}
-                {% for item in low_items %}
+                {% if all_products %}
+                {% for item in all_products %}
                 <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.product_name }}</td>
@@ -139,8 +158,15 @@
                     <td>{{ item.product_type }}</td>
                     <td>{{ item.lowlevel_qty }}</td>
                     <td>{{ item.critical_level_qty }}</td>
-                    <!-- <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
-                    <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td> -->
+                    <td>{{ item.mark_status }}</td>
+                    <td>{{ item.max_issuable_qty }}</td>
+                    <td style="text-align: right;"><a href="{{ url_for('markitems', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">MARK</button></a>
+                    <a href="{{ url_for('unmarkitems', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">UNMARK</button></a>    
+                    </td>
+                    <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendProductCodeToSetMaxIssuableQty('{{item.product_code|tojson}}');">SET QUANTITY</button>
+                    <a href="{{ url_for('removemaxissuableqty', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a>    
+                    </td>
+                    
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -150,6 +176,32 @@
             </table>
         </div>
     </center>
+
+
+        <div class="form-popup form" id="myForm">
+          <form action="/setmaxissuableqty" class="form-container" method="POST">
+            <!-- <h1>Login</h1> -->
+
+            <label for="quantity" style="font-size: 22px;"><b><u>Max. Issuable Qty</u></b></label>
+            <input id = "max_issuable_qty" type="text" placeholder="Enter Max Issuable Quantity" name="Quantity" required>
+
+            <!-- COMMENT FOR "Quantity" INPUT FIELD ENDS -->
+            <input id = "receive_product_code_to_set_issuable_qty" type="hidden" name="product_code" readonly>
+
+            <div class = "signup-btn" style="text-align: left;">
+                <button type="submit" class="" style="font-size: 13px;">Ok</button>
+                <button type="button" class=""  style="font-size: 13px;" onclick="closeForm()">Close</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", mufunction);
+            function mufunction(){
+                alert('{{critical_items_count}}')
+                alert('{{low_items_count}}')
+            }
+        </script> -->
 
 </body>
 

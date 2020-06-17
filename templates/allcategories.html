@@ -39,15 +39,16 @@
 
 <body>
 
-    <div class="topnav" id="myTopnav">
-        <!-- <a><i class="fas fa-home"></i><a -->
-        <!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->   
-        <a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="#" >Add Category</a>
-        <a href="#">Issued Items</a>
-        <a href="#">All Items</a>
-        <a href="#">Critical / Low Items</a>
-        <a href="#">Requests</a>
+    <div class="topnav" id="myTopnav">  
+        <a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="/addcategory" >Add Category</a>
+        <a href="/allcategories">All Categories</a>
+        <a href="/addproduct">Add Product</a>
+        <a href="/issueditems">Issued Items</a>
+        <!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
+        <a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
+        <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+        <a href="/allrequests">All Requests</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
             <!-- <i class="fa fa-bars"></i> -->
 
@@ -60,7 +61,7 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="#">Update</a>
+            <a href="/updatepasswordstoremanager">Update</a>
             <!-- <a href="#">Settings</a> -->
         </div>
     </div>
@@ -111,7 +112,7 @@
                     <th>Lowlevel Qty.</th>
                     <th>Crritical Level Qty.</th>
                     <th>Category Code</th>
-                    <th style="text-align: right;">Add or Remove Items</th>
+                    <!-- <th style="text-align: right;">Add or Remove Items</th> -->
                     
                 </tr>
                 {% if all_categories %}
@@ -123,71 +124,13 @@
                     <td>{{ item.lowlevel_qty }}</td>
                     <td>{{ item.critical_level_qty }}</td>
                     <td>{{ item.category_code }}</td>
-                    <!-- <td>{{ item.fees_paid }}</td>
-                    <td>{{ item.fees_due }}</td> -->
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
+                    <!-- <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
+                        <button type="button" class="btn btn-secondary">REMOVE</button></td> -->
                 </tr>
                 {% endfor %}
                 {% else %}
                 No results found
                 {% endif %}
-
-                <!-- <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                    <td>8</td>
-                    <td>9</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>A</td>
-                    <td>B</td>
-                    <td>C</td>
-                    <td>D</td>
-                    <td>E</td>
-                    <td>F</td>
-                    <td>G</td>
-                    <td>H</td>
-                    <td>I</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>11</td>
-                    <td>12</td>
-                    <td>13</td>
-                    <td>14</td>
-                    <td>15</td>
-                    <td>16</td>
-                    <td>17</td>
-                    <td>18</td>
-                    <td>19</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr> -->
 
             </table>
         </div>

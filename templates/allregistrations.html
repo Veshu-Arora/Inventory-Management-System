@@ -58,16 +58,12 @@
 <body>
 
     <div class="topnav" id="myTopnav">
-        <!-- <a><i class="fas fa-home"></i><a -->
-        <!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->   
-        <a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="#" >Add Category</a>
-        <a href="#">Issued Items</a>
-        <a href="#">All Items</a>
-        <a href="#">Critical / Low Items</a>
-        <a href="#">Requests</a>
+   
+        <a class="active" href="/allregistrations"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="/allfacultymembers">Update Head</a>
+        <a href="/allclerks">Update Store Manager</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <!-- <i class="fa fa-bars"></i> -->
+         
 
         <div class="container" onclick="cross(this)">
             <div class="bar1"></div>
@@ -78,8 +74,8 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="#">Update</a>
-            <!-- <a href="#">Settings</a> -->
+            <a href="/updatepasswordadmin">Update</a>
+            
         </div>
     </div>
 
@@ -118,6 +114,18 @@
         }
 
     </style>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        swal("{{ message }}", "",'{{alert_type}}' );
+    </script>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <center>
         <h1>These are the records of all the Registrations</h1>
         <div style="overflow-x:auto;">
@@ -127,6 +135,7 @@
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Department</th>
+                    <th>Designation</th>
                     <th>Email</th>
                     <th>Phone No.</th>
                     <th>Password</th>
@@ -144,6 +153,7 @@
                     <td>{{ item.first_name }}</td>
                     <td>{{ item.last_name }}</td>
                     <td>{{ item.department }}</td>
+                    <td>{{ item.designation }}</td>
                     <td>{{ item.email }}</td>
                     <td>{{ item.phone }}</td>
                     <td>{{ item.password }}</td>
@@ -159,47 +169,19 @@
                 No results found
                 {% endif %}
 
-                <!-- <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td>XYZ</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ACCEPT</button>
-                        <button type="button" class="btn btn-secondary delete-btn">REJECT</button></td>
-                </tr>
-
-                <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td>XYZ</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ACCEPT</button>
-                        <button type="button" class="btn btn-secondary delete-btn">REJECT</button></td>
-                </tr> -->
 
             </table>
         </div>
 
         <!-- Javascript to show the effect of deleting the table record using "REJECT" button -->
+        <!-- THIS IS CURRENTLY NOT BEING USED -->
 
-        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
         <script>
             $('#customers').on('click', '.delete-btn', function()  {
                 $(this).closest('tr').remove();
             });
-        </script>
+        </script> -->
 
         <!-- Javascript Ends -->
     </center>
@@ -225,15 +207,6 @@
         </div>
     </div>
     
-    <!-- <div class="cat-radio-btn">
-    <input type="radio" id="Not-available" name="Reason" value="Not-available">
-    <label for="Not-available">Not-available</label><br>
-    </div> -->
-
-    <!-- <input type="text" placeholder="Some Other Reason" name="Other Reason" required> -->
-
-    <!-- <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required> -->
 
     <div class = "signup-btn" style="text-align: left;">
         <button type="submit" class="" style="font-size: 13px;">Ok</button>

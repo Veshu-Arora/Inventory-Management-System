@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PROXY TAG FOR PASSING JINJA VARIABLE TO JAVASCRIPT FUNCTION -->
+    <meta id="qty_available" data-qty_available="{{ qty_available }}">
+    <!-- PROXY TAG ENDS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -36,6 +40,7 @@
         }
     </script>
 
+
 </head>
 
 <body>
@@ -51,7 +56,7 @@
         <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
         <a href="/allrequests">All Requests</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <!-- <i class="fa fa-bars"></i> -->
+            
 
         <div class="container" onclick="cross(this)">
             <div class="bar1"></div>
@@ -115,40 +120,30 @@
     {% endwith %}
 
     <center>
-        <h1>These are all the items issued from the Store </h1>
+        <h1>These are all the items currently available in the Store </h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
                     <th>ID</th>
                     <th>Product Name</th>
                     <th>Product Code</th>
+                    <th>Quantity Available</th>
                     <th>Product Type</th>
-                    <th>Requested By</th>
-                    <th>Department</th>
-                    <th>Designation</th>
-                    <th>Requested Qty.</th>
-                    <th>Request Date</th>
-                    <th>Request Status</th>
-                    <th>Issued On</th>
-                    <th>Returned On</th>
+                    <th>Lowlevel Qty.</th>
+                    <th>Critical Level Qty.</th>
                     <!-- <th style="text-align: right;">Add or Remove Items</th> -->
                     
                 </tr>
-                {% if issued_items %}
-                {% for item in issued_items %}
+                {% if all_products %}
+                {% for item in all_products %}
                 <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.product_name }}</td>
                     <td>{{ item.product_code }}</td>
+                    <td>{{ item.qty_available }}</td>
                     <td>{{ item.product_type }}</td>
-                    <td>{{ item.requested_by }}</td>
-                    <td>{{ item.department }}</td>
-                    <td>{{ item.designation }}</td>
-                    <td>{{ item.requested_qty }}</td>
-                    <td>{{ item.request_date }}</td>
-                    <td>{{ item.request_status }}</td>
-                    <td>{{ item.product_issued_on }}</td>
-                    <td>{{ item.returned_on }}</td>
+                    <td>{{ item.lowlevel_qty }}</td>
+                    <td>{{ item.critical_level_qty }}</td>
                     <!-- <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
                     <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td> -->
                 </tr>

@@ -25,18 +25,26 @@
 		x.classList.toggle("change");
 		}
 	</script>
+
+	<style type="text/css">
+		.topnav a:hover{
+			text-decoration: underline;
+		}
+	</style>
+
 </head>
 
 <body>
-    <div class="topnav" id="myTopnav">
-    	<!-- <a><i class="fas fa-home"></i><a -->
-    	<!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->	
-    	<a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
-		<a href="#" >Add Category</a>
-		<a href="#">Issued Items</a>
-		<a href="#">All Items</a>
-		<a href="#">Critical / Low Items</a>
-		<a href="#">Requests</a>
+    <div class="topnav" id="myTopnav">	
+    	<a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
+		<a href="/addcategory" >Add Category</a>
+		<a href="/allcategories">All Categories</a>
+		<a href="/addproduct">Add Product</a>
+		<a href="/issueditems">Issued Items</a>
+		<!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
+		<a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
+		<a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+		<a href="/allrequests">All Requests</a>
 		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
 			<!-- <i class="fa fa-bars"></i> -->
 
@@ -49,7 +57,7 @@
 		</a>
 		<div class="topnav-right">
 			<a href="#">Logout</a>
-			<a href="#">Update</a>
+			<a href="/updatepasswordstoremanager">Update</a>
 			<!-- <a href="#">Settings</a> -->
 		</div>
 	</div>
@@ -76,15 +84,6 @@
 		{% endwith %}
         
         <div class="form">
-			<!-- {% with messages = get_flashed_messages() %}
-				{% if messages %}
-					{% for message in messages %}
-					<script>
-						swal("{{ message }}", "Thank you!", "success");
-					</script>
-					{% endfor %}
-				{% endif %}
-			{% endwith %} -->
 			<h1>Add New Category</h1>
             
             <form action="/addnewcategory" method="POST">
@@ -132,19 +131,6 @@
             </form>
         </div>
     </div>
-
-    <script>
-
-		document.querySelector("#generate-code-btn").addEventListener('click', (event) => {
-		event.preventDefault();
-		uniqueCode();
-		});
-
-		function uniqueCode(){
-		  var fourdigitsrandom = Math.floor(1000 + Math.random() * 9000);
-		  document.getElementById("Unique_code").value=fourdigitsrandom;
-		 } 
-	</script>
 
 </body>
 </html>

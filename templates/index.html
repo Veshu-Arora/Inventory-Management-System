@@ -4,17 +4,26 @@
 	<title>Welcome</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'main.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-	<!-- <script>
-		function myFunction() {
-		  var x = document.getElementById("myTopnav");
-		  if (x.className === "topnav") {
-			x.className += " responsive";
-		  } else {
-			x.className = "topnav";
-		  }
-		}
-	</script> -->
+	<script>
+        function myFunction() {
+          var x = document.getElementById("myTopnav");
+          if (x.className === "topnav") {
+            x.className += " responsive";
+          } else {
+            x.className = "topnav";
+          }
+
+        }
+    </script>
+
+    <script>
+        function cross(x) {
+        x.classList.toggle("change");
+        }
+    </script>
 
 	<script type="text/javascript">
 		function sendDesignation(des){
@@ -30,21 +39,71 @@
 			window.document.location = './login';
 			return false;
 		}
+
+		function sendSuperUserDesignation(des){
+			var superuserdesignation = des;
+			localStorage.setItem("superuserdesignation", superuserdesignation);
+			window.document.location = './superuserlogin';
+			return false;
+		}
 	</script>
+
+	<style type="text/css">
+		.topnav #main-heading {
+			text-align: center;
+			color: white;
+			/*padding-top: 10px;*/
+			font-size: 1.5em;
+			font-weight: bolder;
+			text-decoration: none;
+			background-color: transparent;
+/*			margin-left: 15px;
+*/		}
+
+		.topnav #main-heading a:hover{
+			background-color: transparent;
+		}
+
+		/*@media screen and (max-width: 600px) {
+			.topnav #main-heading a:hover{
+			background-color: transparent;
+			text-decoration: 1.17em;
+		}*/
+	}
+}
+
+	</style>
 
 </head>
 <body>
 
 	<div class="topnav" id="myTopnav">
-		<h2>Inventory  Management  System</h2>
+		<span id="main-heading">Inventory Management  System</span>
+<!-- 		<a class="topnav-left" id="main-heading" href="">Inventory Management  System</a>
+ -->		<!-- <a href="/payfees">Pay Mess Fee</a>
+		<a href="/payfees">Pay Mess Fee</a> -->
+
 		<!-- <a href="/enter" >Enter Student Record</a>
 		<a href="/payfees">Pay Mess Fee</a>
 		<a href="/paydue">Pay Due</a>
 		<a href="/transaction">Transactions</a>
-		<a href="/students">Student Records</a>
-		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
-			<i class="fa fa-bars"></i>
-		</a> -->
+		<a href="/students">Student Records</a> -->
+		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <!-- <i class="fa fa-bars"></i> -->
+
+        <div class="container" onclick="cross(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        </a>
+        <div id="hide-on-minimise" class="topnav-right">
+            <a href="#" onclick="sendSuperUserDesignation('Head')">Head Login</a>
+            <a href="#" onclick="sendSuperUserDesignation('Admin')">Admin Login</a>
+            <a href="#" onclick="sendSuperUserDesignation('Store Manager')">Store-Manager Login</a>
+            <!-- <a href="#">Settings</a> -->
+        </div>
 	</div>
 
 	<div class="container">

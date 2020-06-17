@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PROXY TAG FOR PASSING JINJA VARIABLE TO JAVASCRIPT FUNCTION -->
-    <meta id="qty_available" data-qty_available="{{ qty_available }}">
-    <!-- PROXY TAG ENDS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- JAVASCRIPT LINK FOR TOOLTIP TEXT STARTS -->
@@ -58,13 +55,14 @@
         document.querySelector("#receive_item_id").value =  item_id;
         }
 
-        // function myFunction() {
-        // var x = document.getElementById("requested_qty").value;
-        // var qty_available = querySelector('#qty_available').data("qty_available");
-        // if (x > qty_available) {
-        //     alert("'Requested quantity can not be more than Available quantity!")
-        // }
-        // }
+        function setProductCode(product_code, callback) {
+        document.querySelector("#receive_product_code").value =  product_code;
+        callback();
+        }
+
+        function submitDeleteRequestForm(){
+            document.getElementById("delete_product_request_form").submit();
+        }
 
     </script>
     <!-- jAVASCRIPT FOR FORM ENDS -->
@@ -213,7 +211,8 @@
                     <th>Product Type</th>
                     <th>Lowlevel Qty.</th>
                     <th>Critical Level Qty.</th>
-                    <th style="text-align: right;">Add or Remove Items</th>
+                    <th>Max Issuable Qty.</th>
+                    <th style="text-align: right;">Add or Remove Requests</th>
                     
                 </tr>
                 {% if all_products %}
@@ -226,69 +225,14 @@
                     <td>{{ item.product_type }}</td>
                     <td>{{ item.lowlevel_qty }}</td>
                     <td>{{ item.critical_level_qty }}</td>
+                    <td>{{ item.max_issuable_qty }}</td>
                     <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
-                    <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td>
+                    <button id="product-remove-btn" type="button" class="btn btn-secondary" onclick="setProductCode('{{item.product_code|tojson}}', submitDeleteRequestForm );">REMOVE</button></td>
                 </tr>
                 {% endfor %}
                 {% else %}
                 No results found
                 {% endif %}
-
-                <!-- <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                    <td>8</td>
-                    <td>9</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>A</td>
-                    <td>B</td>
-                    <td>C</td>
-                    <td>D</td>
-                    <td>E</td>
-                    <td>F</td>
-                    <td>G</td>
-                    <td>H</td>
-                    <td>I</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>11</td>
-                    <td>12</td>
-                    <td>13</td>
-                    <td>14</td>
-                    <td>15</td>
-                    <td>16</td>
-                    <td>17</td>
-                    <td>18</td>
-                    <td>19</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr>
-
-                <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td>
-                </tr> -->
 
             </table>
         </div>
@@ -323,6 +267,22 @@
             </div>
           </form>
         </div>
+
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+        <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+        <!-- THIS FORM SENDS THE DATA TO BE USED FOR DELETING THE REQUEST MADE BY USER -->
+        <form action="/deleterequest" id="delete_product_request_form" method="POST">
+            <!-- INPUT FIELDS CONTAINING USER CREDENTIALS -->
+            <input type = "hidden" name="first_name"  value="{{ first_name }}">
+            <input type = "hidden" name="last_name"  value="{{ last_name }}">
+            <input type = "hidden" name="department"  value="{{ department }}">
+            <input type = "hidden" name="registered_as"  value="{{ registered_as }}">
+            <!-- INPUT FIELD ENDS -->
+
+            <input id = "receive_product_code" type="hidden" name="product_code">
+        </form>
+
 
         <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER--IMPORTANT FORM -->
         <form id="requesteditems" method="POST" style="display: none;">       

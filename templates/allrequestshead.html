@@ -40,16 +40,14 @@
 
 <body>
 
-    <div class="topnav" id="myTopnav">  
-        <a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="/addcategory" >Add Category</a>
-        <a href="/allcategories">All Categories</a>
-        <a href="/addproduct">Add Product</a>
-        <a href="/issueditems">Issued Items</a>
-        <!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
-        <a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
-        <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
-        <a href="/allrequests">All Requests</a>
+    <div class="topnav" id="myTopnav">   
+        <a class="active" href="/allproductshead"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href = '/allrequestshead'>Requested Items</a>
+        <a href = '/issueditemshead'>Issued Items</a>
+        <a href = '/criticalitemshead'>Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p>
+        </a>
+        <a href = '/lowitemshead'>Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+        <a href = '/returneditemshead'>Returned Items</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
             <!-- <i class="fa fa-bars"></i> -->
 
@@ -62,8 +60,8 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="/updatepasswordstoremanager">Update</a>
-            <!-- <a href="#">Settings</a> -->
+            <a href="/updatepasswordhead">Update</a>
+            <!-- <a href=""><i class="fa fa-fw fa-bell-on"></i></a> -->
         </div>
     </div>
 
@@ -115,42 +113,56 @@
     {% endwith %}
 
     <center>
-        <h1>These are all the items issued from the Store </h1>
+        <h1>These are the records of all the Requests</h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
                     <th>ID</th>
                     <th>Product Name</th>
                     <th>Product Code</th>
+                    <th>Qty. Available</th>
                     <th>Product Type</th>
                     <th>Requested By</th>
                     <th>Department</th>
                     <th>Designation</th>
                     <th>Requested Qty.</th>
+                    <th>Max Issuable Qty.</th>
                     <th>Request Date</th>
                     <th>Request Status</th>
-                    <th>Issued On</th>
-                    <th>Returned On</th>
-                    <!-- <th style="text-align: right;">Add or Remove Items</th> -->
+                    <th>Reason</th>
+                    <th>Mark Status</th>
+                    <th>Issue Permission</th>
+                    <th style="text-align: right;">Grant or Deny Issue Permission</th>
                     
                 </tr>
-                {% if issued_items %}
-                {% for item in issued_items %}
+                {% if all_requests %}
+                {% for item in all_requests %}
                 <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.product_name }}</td>
                     <td>{{ item.product_code }}</td>
+                    <td>{{ item.qty_available }}</td>
                     <td>{{ item.product_type }}</td>
                     <td>{{ item.requested_by }}</td>
                     <td>{{ item.department }}</td>
                     <td>{{ item.designation }}</td>
                     <td>{{ item.requested_qty }}</td>
+                    <td>{{ item.max_issuable_qty }}</td>
                     <td>{{ item.request_date }}</td>
                     <td>{{ item.request_status }}</td>
-                    <td>{{ item.product_issued_on }}</td>
-                    <td>{{ item.returned_on }}</td>
-                    <!-- <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
-                    <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td> -->
+                    <td>{{ item.reason }}</td>
+                    <td>{{ item.product_mark_status }}</td>
+                    <td>{{ item.permission }}</td>
+                    {% if item.product_mark_status  == 'Marked' %}
+                        <td style="text-align: right;"><a href="{{ url_for('grantissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">GRANT
+                        </button></a>
+                        <a href="{{ url_for('denyissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">DENY
+                        </button></a>
+                        </td>
+                    {% else %}
+                        <td style="text-align: right;">Product Not Marked</td>    
+                    {% endif %}    
+
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -159,6 +171,18 @@
 
             </table>
         </div>
+
+        <!-- Javascript to show the effect of deleting the table record using "REJECT" button -->
+        <!-- THIS JAVASCRIPT IS NOT BEING USED AS OF NOW BUT MAY COME IN USE LATER SOMETIME IN FUTURE -->
+
+        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script>
+            $('#customers').on('click', '.delete-btn', function()  {
+                $(this).closest('tr').remove();
+            });
+        </script>
+
+        <!-- Javascript Ends -->
     </center>
 
 </body>

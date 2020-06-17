@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -40,16 +41,14 @@
 
 <body>
 
-    <div class="topnav" id="myTopnav">  
-        <a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="/addcategory" >Add Category</a>
-        <a href="/allcategories">All Categories</a>
-        <a href="/addproduct">Add Product</a>
-        <a href="/issueditems">Issued Items</a>
-        <!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
-        <a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
-        <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
-        <a href="/allrequests">All Requests</a>
+    <div class="topnav" id="myTopnav">   
+        <a class="active" href="/allproductshead"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href = '/allrequestshead'>Requested Items</a>
+        <a href = '/issueditemshead'>Issued Items</a>
+        <a href = '/criticalitemshead'>Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p>
+        </a>
+        <a href = '/lowitemshead'>Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+        <a href = '/returneditemshead'>Returned Items</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
             <!-- <i class="fa fa-bars"></i> -->
 
@@ -62,8 +61,8 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="/updatepasswordstoremanager">Update</a>
-            <!-- <a href="#">Settings</a> -->
+            <a href="/updatepasswordhead">Update</a>
+            <!-- <a href=""><i class="fa fa-fw fa-bell-on"></i></a> -->
         </div>
     </div>
 
@@ -130,7 +129,6 @@
                     <th>Request Date</th>
                     <th>Request Status</th>
                     <th>Issued On</th>
-                    <th>Returned On</th>
                     <!-- <th style="text-align: right;">Add or Remove Items</th> -->
                     
                 </tr>
@@ -148,7 +146,6 @@
                     <td>{{ item.request_date }}</td>
                     <td>{{ item.request_status }}</td>
                     <td>{{ item.product_issued_on }}</td>
-                    <td>{{ item.returned_on }}</td>
                     <!-- <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendItemId('{{item.id|tojson}}');">ADD</button>
                     <a href="{{ url_for('deleterequest', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a></td> -->
                 </tr>

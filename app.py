@@ -1,17 +1,37 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from datetime import datetime
 import math, random 
 from pymsgbox import *
 import easygui
+from flask_mail import Mail, Message
+import os
+import string 
+import random
+from markupsafe import escape
 
 app = Flask(__name__)
+
+# CONFIGURATIONS FOR FLASK-MAIL-DO NOT MODIFY!!
+
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
+))
+
+
+mail = Mail(app)
 app.secret_key = "super secret key"
 DATABASE_URL = "postgres://wainhlvxrgqwoo:9902be4ffc31450a1e9924f03879d1788cfb7fa659ae511f16223d4ef9c351c8@ec2-3-223-21-106.compute-1.amazonaws.com:5432/d5nru0s34hfo11"
 
 # Set up database
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_size=10, max_overflow=20)
 db = scoped_session(sessionmaker(bind=engine))
 
 department = {
@@ -54,7 +74,11 @@ def addproduct():
 		category_code = r.category_code
 		category_name = r.category_name
 		category_items[str(category_code)] = category_name
-	return render_template('addproduct.html', category_items = category_items)
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('addproduct.html', category_items = category_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/addnewproduct",methods=["POST"])
@@ -78,7 +102,11 @@ def addnewproduct():
 		db.close()
 		alert_type = 'success'
 		flash( f"{ product_name } quantity has been successfully Updated. Now the available quantity is { updated_qty } units.")
-		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 	elif (product_exists == []):
@@ -96,12 +124,20 @@ def addnewproduct():
 		db.close()
 		alert_type = 'success'
 		flash( f"{ product_name } has been successfully added with { qty_available } units.")
-		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	else:
 		alert_type = 'error'
 		flash (f"Oops, Something went wrong!")	
-		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items)		
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('addproduct.html', alert_type = alert_type, category_items = category_items, low_items_count = low_items_count, critical_items_count = critical_items_count)		
 
 @app.route("/")
 def index():
@@ -147,7 +183,7 @@ def newregistration():
 			db.commit()
 			db.close()
 			alert_type = 'success'
-			flash( f"Your rregistration request has been successfully submitted")
+			flash( f"Your registration request has been successfully submitted")
 			return render_template('signup.html', alert_type = alert_type, department = department)
 
 		elif password != cpassword:
@@ -283,9 +319,14 @@ def homeredirect():
 
 
 
-@app.route("/updatepass")
-def updatepass():
-	return render_template('updatepass.html') 
+@app.route("/resetpassworduser")
+def resetpassworduser():
+	return render_template('resetpassworduser.html') 
+
+
+@app.route("/resetpasswordsuperuser")
+def resetpasswordsuperuser():
+	return render_template('resetpasswordsuperuser.html') 	
 
 
 @app.route("/updatepassword")
@@ -328,9 +369,13 @@ def passwordupdate():
 		return render_template('updatepassword.html', alert_type = alert_type)	
 
 
-@app.route("/storemanager",methods=["POST", "GET"])
-def storemanager():
-	return render_template('store-mgr.html') 
+@app.route("/addcategory",methods=["POST", "GET"])
+def addcategory():
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('addcategory.html', low_items_count = low_items_count, critical_items_count = critical_items_count) 
 
 
 # @app.route("/generatecode",methods=["post"])
@@ -351,7 +396,7 @@ def storemanager():
 	# print('end-wdnjkdfjd')    
 
 
-#   return render_template('store-mgr.html', Unique_code = Unique_code) 
+#   return render_template('addcategory.html', Unique_code = Unique_code) 
 
 #     # newcat = request.form.get('Newcat')
 #     # cattype = request.form.get('Cattype')
@@ -376,7 +421,11 @@ def addnewcategory():
 		if (result):
 			alert_type = 'warning'
 			flash (f"Sorry, Item { category_name } already exists with Category code { category_code }")
-			return render_template('store-mgr.html', alert_type = alert_type)
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
+
+			return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 	
 		elif(result == []):
 			db.execute("INSERT INTO category(category_name, category_type, lowlevel_qty, critical_level_qty, category_code) VALUES(:category_name, :category_type, :lowlevel_qty, :critical_level_qty, :category_code)",
@@ -385,11 +434,19 @@ def addnewcategory():
 			db.close()
 			alert_type = 'success'
 			flash( f"New category { category_name } has been successfully added!")
-			return render_template('store-mgr.html', alert_type = alert_type)
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
+
+			return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	alert_type = 'error'
-	flash (f"Oops, Something went wrong!")	
-	return render_template('store-mgr.html', alert_type = alert_type)
+	flash (f"Oops, Something went wrong!")
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/admin")
@@ -408,28 +465,44 @@ def head():
 def test():
 	return render_template('test.html')
 
-@app.route("/allproducts",methods=["POST", "GET"])
-def allproducts():
+@app.route("/allproductsstoremanager",methods=["POST", "GET"])
+def allproductsstoremanager():
 	all_products = db.execute("SELECT * FROM products").fetchall()
-	return render_template('allproducts.html', all_products = all_products)
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('allproductsstoremanager.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/criticalitems",methods=["GET"])
 def criticalitems():
 	critical_items = db.execute("SELECT * FROM products WHERE qty_available <= critical_level_qty").fetchall()
-	return render_template('criticalitems.html', critical_items = critical_items)
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('criticalitems.html', critical_items = critical_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/lowitems",methods=["GET"])
 def lowitems():
 	low_items = db.execute("SELECT * FROM products WHERE qty_available <= lowlevel_qty").fetchall()
-	return render_template('lowitems.html', low_items = low_items)	
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('lowitems.html', low_items = low_items, low_items_count = low_items_count, critical_items_count = critical_items_count)	
 
 
 @app.route("/issueditems",methods=["GET"])
 def issueditems():
 	issued_items = db.execute("SELECT * FROM requests WHERE product_issued_on != 'Not-issued'").fetchall()
-	return render_template('issueditems.html', issued_items = issued_items)	
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('issueditems.html', issued_items = issued_items, low_items_count = low_items_count, critical_items_count = critical_items_count)	
 
 @app.route("/userissueditems",methods=["GET","POST"])
 def userissueditems():
@@ -448,7 +521,10 @@ def userissueditems():
 	issued_items = db.execute("SELECT * FROM requests WHERE product_issued_on != 'Not-issued' AND requested_by=:full_name",
 	{"full_name":full_name}).fetchall()
 
-	return render_template('userissueditems.html', issued_items = issued_items)
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('userissueditems.html', issued_items = issued_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/returneditems",methods=["GET"])
@@ -496,6 +572,99 @@ def userrequesteditems():
 
 	return render_template('userrequesteditems.html', requested_items = requested_items)
 
+# @app.route("/addrequest",methods=["GET", "POST"])
+# def addrequest():
+
+# 	now = datetime.now()
+# 	request_date = now.strftime("%d-%m-%Y")
+# 	request_time = now.strftime("%H:%M:%S")
+
+# 	first_name = request.form.get('first_name')
+# 	last_name = request.form.get('last_name')
+
+# 	requested_by = str(first_name) + " " + str(last_name)
+
+# 	department = request.form.get('department')
+# 	designation = request.form.get('registered_as')
+
+# 	product_id = request.form.get('product_id')
+# 	add_this_produt = db.execute("SELECT * FROM products WHERE id=:product_id",
+# 	{"product_id":product_id}).fetchall()
+# 	db.commit()
+# 	db.close()
+
+# 	for r in add_this_produt:
+# 		product_name   = r.product_name
+# 		product_code   = r.product_code
+# 		qty_available  = r.qty_available
+# 		product_type   = r.product_type
+# 		lowlevel_qty   = r.lowlevel_qty
+# 		critical_level_qty = r.critical_level_qty
+# 		product_mark_status = r.mark_status
+# 		max_issuable_qty  = r.max_issuable_qty
+
+
+# 	if product_mark_status == 'Marked':
+# 		permission = 'Pending'
+
+# 	elif product_mark_status == 'Not-Marked':
+# 		permission = 'Not-Needed'	
+
+# 	requested_qty = request.form.get('Quantity')
+
+# 	product_request_exists = db.execute("SELECT * FROM requests WHERE product_code=:product_code AND requested_by=:requested_by",
+# 	{'product_code':product_code, "requested_by":requested_by}).fetchall()
+
+# 	if (product_request_exists):
+# 		print('START')
+# 		print('inside product_request_exists')
+# 		print('ENDDD')
+# 		for r in product_request_exists:
+# 			previous_requested_qty = r.requested_qty
+# 			new_requested_qty = previous_requested_qty  + int(requested_qty)
+
+# 		# GIVE A FLASH MESSAGE THAT PRODUCT REQUEST QUANTITY UPDATED 
+
+# 		# DO NOT FORGET TO GIVE THE FLASH MESSAGE
+
+# 		db.execute("UPDATE requests SET requested_qty=:requested_qty WHERE product_code=:product_code AND requested_by=:requested_by",
+# 		{"requested_qty":new_requested_qty, "product_code":product_code, "requested_by":requested_by})
+# 		db.commit()
+# 		db.close()
+
+# 	# !!!!!!!!!!!!!!!!!!!!!! CHECKING COMPLETE !!!!!!!!!!!!!!!!!!!!
+	
+# 	else:
+# 		if requested_qty > max_issuable_qty:
+# 			print('inside else CONDITION i.e.')
+# 			print('warning will be issued')
+# 			alert_type = 'warning'
+# 			flash (f"Sorry, You can not request for more than { max_issuable_qty } units of this item!")
+
+# 			all_products = db.execute("SELECT * FROM products").fetchall()
+# 			return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+# 			last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)
+
+# 		elif requested_qty <= max_issuable_qty:	
+# 			print('inside elif CONDITION i.e.')
+# 			print('warning will NOT be issued')
+
+# 			db.execute("INSERT INTO requests(product_name, product_code, qty_available, product_type, lowlevel_qty, critical_level_qty, requested_by, requested_qty, request_date, department, designation, product_mark_status, max_issuable_qty, permission) VALUES(:product_name, :product_code, :qty_available, :product_type, :lowlevel_qty, :critical_level_qty, :requested_by, :requested_qty, :request_date, :department, :designation, :product_mark_status, :max_issuable_qty, :permission)",
+# 			{"product_name":product_name,"product_code":product_code,"qty_available":qty_available,"product_type":product_type, "lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty, "requested_by":requested_by, "requested_qty":requested_qty, "request_date":request_date, "department":department, "designation":designation, "product_mark_status":product_mark_status, "max_issuable_qty":max_issuable_qty, "permission":permission})
+# 			db.commit()
+# 			db.close()    
+
+# 	all_products = db.execute("SELECT * FROM products").fetchall()
+# 	return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+# 	last_name = last_name, department = department, registered_as = designation)
+
+
+
+
+
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADDING ADD REQUEST FEATURE AGAIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADDING ADD REQUEST FEATURE AGAIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 @app.route("/addrequest",methods=["GET", "POST"])
 def addrequest():
 
@@ -511,97 +680,268 @@ def addrequest():
 	department = request.form.get('department')
 	designation = request.form.get('registered_as')
 
+	requested_qty = request.form.get('Quantity')
+
 	product_id = request.form.get('product_id')
-	add_this_produt = db.execute("SELECT * FROM products WHERE id=:product_id",
+	add_this_product = db.execute("SELECT * FROM products WHERE id=:product_id",
 	{"product_id":product_id}).fetchall()
 	db.commit()
 	db.close()
 
-	for r in add_this_produt:
+	for r in add_this_product:
 		product_name   = r.product_name
 		product_code   = r.product_code
 		qty_available  = r.qty_available
 		product_type   = r.product_type
 		lowlevel_qty   = r.lowlevel_qty
 		critical_level_qty = r.critical_level_qty
+		product_mark_status = r.mark_status
+		max_issuable_qty  = r.max_issuable_qty
+
+		
+	product_request_exists = db.execute("SELECT * FROM requests WHERE product_code=:product_code AND requested_by=:requested_by",
+	{'product_code':product_code, "requested_by":requested_by}).fetchall()
+
+	print('start-start-start')
+	print(max_issuable_qty)
+	print(requested_qty)
+	print('end-wdnjkdfjd-enddd')
+
+	# THIS CODE WILL RUN WHEN THE max_issuable_qty IS Not-Specified FOR THE PRODUCT FOR WHICH REQUEST IS MADE
+
+	if max_issuable_qty == 'Not-Specified':
+		# CHECKING WHETHER PRODUCT REQUEST ALREADY EXISTS OR NOT
+
+		if (product_request_exists):
+			
+			for r in product_request_exists:
+				previous_requested_qty = r.requested_qty
+				new_requested_qty = previous_requested_qty  + int(requested_qty)
+
+			# GIVE A FLASH MESSAGE THAT PRODUCT REQUEST QUANTITY UPDATED 
+
+			# DO NOT FORGET TO GIVE THE FLASH MESSAGE
+
+			db.execute("UPDATE requests SET requested_qty=:requested_qty WHERE product_code=:product_code AND requested_by=:requested_by",
+			{"requested_qty":new_requested_qty, "product_code":product_code, "requested_by":requested_by})
+			db.commit()
+			db.close()
+
+			alert_type = 'success'
+			flash (f"Your product request has been updated. Now the requested qty for { product_name } is { new_requested_qty } units.")
+
+			all_products = db.execute("SELECT * FROM products").fetchall()
+			return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+			last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)
+
+		# !!!!!!!!!!!!!!!!!!!!!! CHECKING COMPLETE !!!!!!!!!!!!!!!!!!!!
+
+		else:
+			if product_mark_status == 'Marked':
+				permission = 'Pending'
+
+			else:
+				permission = 'Not-Needed'
+
+		
+			db.execute("INSERT INTO requests(product_name, product_code, qty_available, product_type, lowlevel_qty, critical_level_qty, requested_by, requested_qty, request_date, department, designation, product_mark_status, permission) VALUES(:product_name, :product_code, :qty_available, :product_type, :lowlevel_qty, :critical_level_qty, :requested_by, :requested_qty, :request_date, :department, :designation, :product_mark_status, :permission)",
+			{"product_name":product_name,"product_code":product_code,"qty_available":qty_available,"product_type":product_type, "lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty, "requested_by":requested_by, "requested_qty":requested_qty, "request_date":request_date, "department":department, "designation":designation, "product_mark_status":product_mark_status, "permission":permission})
+			db.commit()
+			db.close()    
+
+			all_products = db.execute("SELECT * FROM products").fetchall()
+			return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+			last_name = last_name, department = department, registered_as = designation)
 
 
+	# THE ABOVE CODE RUNS WHEN THE REQUEST IS MADE FOR A PRODUCT WHOSE max_issuable_qty IS Not-Specified.
+
+	# THIS CODE WILL RUN WHEN THE max_issuable_qty IS A SPECIFIED VALUE FOR THE PRODUCT FOR WHICH REQUEST IS MADE
+
+	elif max_issuable_qty != 'Not-Specified':
+
+		if int(requested_qty) > int(max_issuable_qty):
+			alert_type = 'warning'
+			flash (f"Sorry, You can not request for more than { max_issuable_qty } units of this item!")
+
+			all_products = db.execute("SELECT * FROM products").fetchall()
+			return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+			last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)
+
+		elif int(requested_qty) <= int(max_issuable_qty):	
+
+		# CHECKING WHETHER PRODUCT REQUEST ALREADY EXISTS OR NOT
+
+			if (product_request_exists):
+				
+				for r in product_request_exists:
+					previous_requested_qty = r.requested_qty
+					new_requested_qty = previous_requested_qty  + int(requested_qty)
+
+					remaining_issuable_qty = int(max_issuable_qty) - int(previous_requested_qty)
 
 
-	# DON'T FORGET TO ADD THE NAME OF PERSON MAKING THE REQUEST AND THE  QTY REQUESTED
+				if int(new_requested_qty) > int(max_issuable_qty):
 
-	requested_qty = request.form.get('Quantity')
-	# requested_by = ?????
+					alert_type = 'warning'
+					flash (f"Sorry, You can not request for more than { max_issuable_qty } units of this item! Since You have already requested for { previous_requested_qty } units, So you can request only for { remaining_issuable_qty } more units.")
 
-	# NAME OF PERSON REQUESTING ITEM AND QUQNTITY TO BE ADDED BETWEEN THESE COMMENTS
+					all_products = db.execute("SELECT * FROM products").fetchall()
+					return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+					last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)
 
-	# if int(requested_qty) > qty_available:
-	# 	alert(text='Requested quantity can not be more than Available quantity!', title='Warning!', button='OK')
-	# 	easygui.msgbox('This is a basic message box.', 'Title Goes Here')
-	# 	<script>
-	# 	alert("Requested quantity can not be more than Available quantity!")
-	# 	</script>
+				elif int(new_requested_qty) <= int(max_issuable_qty):
 
-	# print('STARTTTTT')
-	# print(requested_by)
-	# print(department)
-	# print(designation)
-	# print('ENDDD')
+					db.execute("UPDATE requests SET requested_qty=:new_requested_qty WHERE product_code=:product_code AND requested_by=:requested_by",
+					{"new_requested_qty":new_requested_qty, "product_code":product_code, "requested_by":requested_by})
+					db.commit()
+					db.close()
+
+					alert_type = 'success'
+					flash (f"Your product request has been updated. Now the requested qty for { product_name }is { new_requested_qty } units.")
+
+					all_products = db.execute("SELECT * FROM products").fetchall()
+					return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+					last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)
+
+			# !!!!!!!!!!!!!!!!!!!!!! CHECKING COMPLETE !!!!!!!!!!!!!!!!!!!!
+
+			else:	
+
+				if product_mark_status == 'Marked':
+					permission = 'Pending'
+
+				else:
+					permission = 'Not-Needed'
+
+		
+				db.execute("INSERT INTO requests(product_name, product_code, qty_available, product_type, lowlevel_qty, critical_level_qty, requested_by, requested_qty, request_date, department, designation, product_mark_status, permission, max_issuable_qty) VALUES(:product_name, :product_code, :qty_available, :product_type, :lowlevel_qty, :critical_level_qty, :requested_by, :requested_qty, :request_date, :department, :designation, :product_mark_status, :permission, :max_issuable_qty)",
+				{"product_name":product_name,"product_code":product_code,"qty_available":qty_available,"product_type":product_type, "lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty, "requested_by":requested_by, "requested_qty":requested_qty, "request_date":request_date, "department":department, "designation":designation, "product_mark_status":product_mark_status, "permission":permission, "max_issuable_qty":max_issuable_qty})
+				db.commit()
+				db.close()    
+
+				all_products = db.execute("SELECT * FROM products").fetchall()
+				return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+				last_name = last_name, department = department, registered_as = designation)
+
+
+	# THE ABOVE CODE RUNS WHEN THE REQUEST IS MADE FOR A PRODUCT WHOSE max_issuable_qty IS A SPECIFIED VALUE.			
+
+
+	else:
+		alert_type = 'error'
+		flash(f"Oops, Something went wrong!")
+		all_products = db.execute("SELECT * FROM products").fetchall()
+		return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+		last_name = last_name, department = department, registered_as = designation, alert_type = alert_type)		
+
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADD REQUEST FEATURE AGAIN ADDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADD REQUEST FEATURE AGAIN ADDED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 	
-	db.execute("INSERT INTO requests(product_name, product_code, qty_available, product_type, lowlevel_qty, critical_level_qty, requested_by, requested_qty, request_date, department, designation) VALUES(:product_name, :product_code, :qty_available, :product_type, :lowlevel_qty, :critical_level_qty, :requested_by, :requested_qty, :request_date, :department, :designation)",
-	{"product_name":product_name,"product_code":product_code,"qty_available":qty_available,"product_type":product_type, "lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty, "requested_by":requested_by, "requested_qty":requested_qty, "request_date":request_date, "department":department, "designation":designation})
-	db.commit()
-	db.close()    
-
-	# return f"Product Request Added"
-	all_products = db.execute("SELECT * FROM products").fetchall()
-	return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, last_name = last_name, department = department, registered_as = designation)
-	
 
 
-@app.route("/deleterequest/<product_code>",methods=["GET", "POST"])
-def deleterequest(product_code):
+@app.route("/deleterequest",methods=["GET", "POST"])
+def deleterequest():
 
 	# now = datetime.now()
 	# leaving_time = now.strftime("%H:%M:%S")
 
-	# DELETE QUERY MUST ALSO INCLUDE THE NAME OF PERSON MAKING THE DELETE REQUEST
-	#NAME OF PERSON WILL BE TAKEN AT LOGIN TIME FROM HIS PHONE NUMBER
+	first_name = request.form.get('first_name')
+	last_name = request.form.get('last_name')
+
+	requested_by = str(first_name) + " " + str(last_name)
+
+	department = request.form.get('department')
+	designation = request.form.get('registered_as')
+
+	product_code = request.form.get('product_code')
 	
-	db.execute("DELETE from requests WHERE product_code=:product_code",
-	{"product_code":product_code})
+	db.execute("DELETE from requests WHERE product_code=:product_code AND requested_by=:requested_by",
+	{"product_code":product_code, "requested_by":requested_by})
 	db.commit()
 	db.close()
-	return redirect(url_for('allproducts'))
 
-	# DON'T FORGET TO ADD THE NAME OF PERSON MAKING THE DELETE REQUEST
+	all_products = db.execute("SELECT * FROM products").fetchall()
+	return render_template('allproductsuser.html', all_products = all_products, first_name = first_name, 
+	last_name = last_name, department = department, registered_as = designation)
+
 
 
 @app.route("/allcategories",methods=["POST", "GET"])
 def allcategories():
 	all_categories = db.execute("SELECT * FROM category").fetchall()
-	return render_template('allcategories.html', all_categories = all_categories)
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('allcategories.html', all_categories = all_categories, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/allrequests")
 def allrequests():
 	all_requests = db.execute("SELECT * FROM requests").fetchall()
-	return render_template('allrequests.html', all_requests = all_requests)  
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('allrequests.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)  
 
 
 @app.route("/acceptrequest/<product_request_id>",methods=["GET", "POST"])
 def acceptrequest(product_request_id):
 
-	# UPDATE QUERY MUST ALSO INCLUDE THE NAME OF PERSON MAKING THE UPDATE REQUEST
-	# NAME OF PERSON WILL BE TAKEN AT LOGIN TIME FROM HIS PHONE NUMBER
-
 	new_status = 'Approved'
+
+	result = db.execute("SELECT * from requests WHERE id=:product_request_id",
+	{"product_request_id":product_request_id}).fetchall()
+
+	for r in result:
+		product_mark_status = r.product_mark_status
+		permission = r.permission
+
 	
-	db.execute("UPDATE requests SET reason = NULL, request_status=:new_status WHERE id=:product_request_id",
-	{"product_request_id":product_request_id, "new_status":new_status})
-	db.commit()
-	db.close()
-	return redirect(url_for('allrequests'))
+	if product_mark_status == 'Not-Marked' or product_mark_status == 'Marked' and permission == 'Granted':
+		db.execute("UPDATE requests SET reason = NULL, request_status=:new_status WHERE id=:product_request_id",
+		{"product_request_id":product_request_id, "new_status":new_status})
+		db.commit()
+		db.close()
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+		return render_template('allrequests.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	elif product_mark_status == 'Marked' and permission == 'Pending':
+		alert_type = 'info'
+		flash (f"Sorry, This request has not yet been accepted by the Head!")
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	elif product_mark_status == 'Marked' and permission == 'Denied':
+		alert_type = 'warning'
+		flash (f"Sorry, This request has been rejected by the Head!")
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops, Something went wrong!")
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+			
 
 
 @app.route("/rejectrequest",methods=["GET", "POST"])
@@ -629,7 +969,12 @@ def rejectrequest():
 	# print(rejection_reason)
 	# print('ENDDD')
 
-	return redirect(url_for('allrequests'))
+	all_requests = db.execute("SELECT * FROM requests").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('allrequests.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	# DON'T FORGET TO ADD THE NAME OF PERSON MAKING THE DELETE REQUEST    
 
@@ -653,25 +998,42 @@ def issueproduct(product_request_id):
 		{"product_issued_on":product_issue_date, "product_request_id":product_request_id})
 		db.commit()
 		db.close()
-		return redirect(url_for('allrequests'))
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	elif request_status == 'Not-Approved':
 		alert_type = 'error'
 		flash (f"Sorry, This request has been Rejected!")
 		all_requests = db.execute("SELECT * FROM requests").fetchall()
-		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	elif request_status == 'Pending':
 		alert_type = 'warning'
 		flash (f"Sorry, This request has not been approved yet!")
 		all_requests = db.execute("SELECT * FROM requests").fetchall()
-		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	else:
 		alert_type = 'error'
 		flash (f"Oops, Something went wrong!")	
 		all_requests = db.execute("SELECT * FROM requests").fetchall()
-		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 
 @app.route("/returnproduct/<product_request_id>/<product_issued_on>",methods=["GET", "POST"])
@@ -685,20 +1047,1046 @@ def returnproduct(product_request_id,product_issued_on):
 		alert_type = 'error'
 		flash (f"Sorry, This product was never issued!")	
 		all_requests = db.execute("SELECT * FROM requests").fetchall()
-		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type)
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	elif product_issued_on != 'Not-issued':
 		db.execute("UPDATE requests SET returned_on=:product_returned_on WHERE id=:product_request_id",
 		{"product_returned_on":product_return_date, "product_request_id":product_request_id})
 		db.commit()
 		db.close()
-		return redirect(url_for('allrequests'))	
+		all_requests = db.execute("SELECT * FROM requests").fetchall()
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+		
+		return render_template('allrequests.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)	
 
 	else:
 		alert_type = 'error'
 		flash (f"Oops, Something went wrong!")	
 		all_requests = db.execute("SELECT * FROM requests").fetchall()
-		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type)				
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('allrequests.html', all_requests = all_requests, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+# THIS IS A VERY IMPORTANT FUNCTION THAT FINDS THE NUMBER OF CRITICAL AND LOW ITEMS IN THE STORE
+# THESE VALUES ARE THEN SHOWN IN THE NAVIGATION BAR OF STORE MANAGER AND HEAD
+
+def findItemsCount():
+	low_items = db.execute("SELECT * FROM products WHERE qty_available <= lowlevel_qty").fetchall()
+
+	# COUNTING THE NUMBER OF ITEMS BELOW LOW LEVEL
+	i = 0
+	count = 0
+	for item in low_items:
+		i += 1
+
+	low_items_count = i
+
+	critical_items = db.execute("SELECT * FROM products WHERE qty_available <= critical_level_qty").fetchall()
+
+	# COUNTING THE NUMBER OF ITEMS BELOW CRITICAL LEVEL
+	i = 0
+	count = 0
+	for item in critical_items:
+		i += 1
+
+	critical_items_count = i
+
+	return low_items_count, critical_items_count
+
+@app.route("/allproductshead")
+def allproductshead():
+	all_products = db.execute("SELECT * FROM products").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()	
+
+	return render_template('allproductshead.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+@app.route("/setmaxissuableqty",methods=["GET", "POST"])
+def setmaxissuableqty():
+	product_code = request.form.get('product_code')
+	max_issuable_qty = request.form.get('Quantity')
+
+	db.execute("UPDATE products SET max_issuable_qty=:max_issuable_qty WHERE product_code=:product_code",
+	{"max_issuable_qty":max_issuable_qty, "product_code":product_code})
+	db.commit()
+	db.close()
+
+	# UPDATING max_issuable_qty COLUMN VALUE IN REQUESTS TABLE WHEN THE UPPERLIMIT ON max_issuable_qty IS SET 
+	db.execute("UPDATE requests SET max_issuable_qty=:max_issuable_qty WHERE product_code=:product_code",
+	{"max_issuable_qty":max_issuable_qty, "product_code":product_code})
+	db.commit()
+	db.close()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_products = db.execute("SELECT * FROM products").fetchall()
+	return render_template('allproductshead.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/removemaxissuableqty/<product_code>",methods=["GET", "POST"])
+def removemaxissuableqty(product_code):
+
+	db.execute("UPDATE products SET max_issuable_qty = DEFAULT WHERE product_code=:product_code",
+	{"product_code":product_code})
+	db.commit()
+	db.close()
+
+	# UPDATING max_issuable_qty COLUMN VALUE IN REQUESTS TABLE WHEN THE UPPERLIMIT ON max_issuable_qty IS REMOVED
+	db.execute("UPDATE requests SET max_issuable_qty = DEFAULT WHERE product_code=:product_code",
+	{"product_code":product_code})
+	db.commit()
+	db.close()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_products = db.execute("SELECT * FROM products").fetchall()
+	return render_template('allproductshead.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/markitems/<product_code>",methods=["GET", "POST"])
+def markitems(product_code):
+
+	mark_status = "Marked"
+
+	db.execute("UPDATE products SET mark_status=:mark_status WHERE product_code=:product_code",
+	{"mark_status":mark_status, "product_code":product_code})
+	db.commit()
+	db.close()
+
+	# UPDATING product_mark_status AND permission COLUMN VALUE IN REQUESTS TABLE WHEN AN ITEM IS MARKED
+	updated_permission = "Pending"
+	db.execute("UPDATE requests SET product_mark_status=:mark_status, permission=:updated_permission WHERE product_code=:product_code",
+	{"mark_status":mark_status,"updated_permission":updated_permission, "product_code":product_code})
+	db.commit()
+	db.close()
+
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_products = db.execute("SELECT * FROM products").fetchall()
+	return render_template('allproductshead.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/unmarkitems/<product_code>",methods=["GET", "POST"])
+def unmarkitems(product_code):
+
+	db.execute("UPDATE products SET mark_status = DEFAULT WHERE product_code=:product_code",
+	{"product_code":product_code})
+	db.commit()
+	db.close()
+
+	# UPDATING product_mark_status AND permission COLUMN VALUE IN REQUESTS TABLE WHEN AN ITEM IS UNMARKED
+	db.execute("UPDATE requests SET product_mark_status = DEFAULT, permission = DEFAULT WHERE product_code=:product_code",
+	{"product_code":product_code})
+	db.commit()
+	db.close()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_products = db.execute("SELECT * FROM products").fetchall()
+	return render_template('allproductshead.html', all_products = all_products, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+
+@app.route("/allrequestshead")
+def allrequestshead():
+	all_requests = db.execute("SELECT * FROM requests").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('allrequestshead.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+
+@app.route("/issueditemshead",methods=["GET"])
+def issueditemshead():
+	issued_items = db.execute("SELECT * FROM requests WHERE product_issued_on != 'Not-issued'").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('issueditemshead.html', issued_items = issued_items, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+
+@app.route("/criticalitemshead",methods=["GET"])
+def criticalitemshead():
+	critical_items = db.execute("SELECT * FROM products WHERE qty_available <= critical_level_qty").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('criticalitemshead.html', critical_items = critical_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/lowitemshead",methods=["GET"])
+def lowitemshead():
+	low_items = db.execute("SELECT * FROM products WHERE qty_available <= lowlevel_qty").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('lowitemshead.html', low_items = low_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/returneditemshead",methods=["GET"])
+def returneditemshead():
+	returned_items = db.execute("SELECT * FROM requests WHERE product_type != 'Consumable' AND product_issued_on != 'Not-issued' ").fetchall()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('returneditemshead.html', returned_items = returned_items, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/updatepasswordhead",methods=["GET"])
+def updatepasswordhead():
+
+	# WE STILL NEED TO RECEIEVE THE EMAIL OR PHONE NUMBER OF USER TO UPDATE THE PASSWORD
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('updatepasswordhead.html', low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/updatepasswordstoremanager",methods=["GET"])
+def updatepasswordstoremanager():
+
+	# WE STILL NEED TO RECEIEVE THE EMAIL OR PHONE NUMBER OF USER TO UPDATE THE PASSWORD
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	return render_template('updatepasswordstoremanager.html', low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	
+@app.route("/updatepasswordadmin",methods=["GET"])
+def updatepasswordadmin():
+
+	return render_template('updatepasswordadmin.html')
+
+
+@app.route("/grantissuepermission/<product_request_id>",methods=["GET", "POST"])
+def grantissuepermission(product_request_id):
+
+	updated_permission = 'Granted'
+
+	db.execute("UPDATE requests SET permission=:updated_permission WHERE id=:product_request_id",
+	{"updated_permission":updated_permission, "product_request_id":product_request_id})
+	db.commit()
+	db.close()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_requests = db.execute("SELECT * FROM requests").fetchall()
+	return render_template('allrequestshead.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/denyissuepermission/<product_request_id>",methods=["GET", "POST"])
+def denyissuepermission(product_request_id):
+
+	updated_permission = 'Denied'
+
+	db.execute("UPDATE requests SET permission=:updated_permission WHERE id=:product_request_id",
+	{"updated_permission":updated_permission, "product_request_id":product_request_id})
+	db.commit()
+	db.close()
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	all_requests = db.execute("SELECT * FROM requests").fetchall()
+	return render_template('allrequestshead.html', all_requests = all_requests, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+@app.route("/resetpassword",methods=["GET", "POST"])
+def resetpassword():
+	destination_email = request.form.get('email')
+
+	user_name = db.execute("SELECT first_name FROM registrations WHERE email=:destination_email",
+	{"destination_email":destination_email}).fetchone()[0]
+
+	# initializing size of string to be used as the new password for login 
+	N = 7
+	  
+	# using random.choices() 
+	# generating random strings  
+	random_string = ''.join(random.choices(string.ascii_uppercase +
+	                             string.digits, k = N)) 
+
+	new_password = str(random_string)
+
+	db.execute("UPDATE registrations SET password=:new_password WHERE email=:destination_email",
+	{"new_password":new_password, "destination_email":destination_email})
+	db.commit()
+	db.close()
+
+	msg = Message(subject="Inventory-Mgmt-System:Password Reset Request",
+	sender=app.config.get("MAIL_USERNAME"),
+	recipients = [destination_email],
+	body = "Hey " + user_name + "," + " You requested for a password Reset for your account.\n"
+	"Your new password is: " + new_password + "\nYou can now login using your new Password." 
+	"\nHave a nice day!" +"\n\n\n" + "Regards" + "\nVikrant Arora" + "\nDeveloper-Inventory Management System" )
+
+	mail.send(msg)	
+
+	alert_type = 'success'
+	flash (f"Your New Password has been sent to Your email address { destination_email }")	
+	return render_template('resetpassworduser.html', alert_type = alert_type)
+
+
+
+#	THIS CODE IS USED TO RESET THE PASSWORD OF SUPERUSERS AND SEND THEM THE UPDATED PASSWORD THROUGH EMAIL
+
+@app.route("/superuserresetpassword",methods=["GET", "POST"])
+def superuserresetpassword():
+	destination_email = request.form.get('email')
+
+	superuser_name = db.execute("SELECT first_name FROM superuser WHERE email=:destination_email",
+	{"destination_email":destination_email}).fetchone()[0]
+
+	# initializing size of string to be used as the new password for login 
+	N = 7
+	  
+	# using random.choices() 
+	# generating random strings  
+	random_string = ''.join(random.choices(string.ascii_uppercase +
+	                             string.digits, k = N)) 
+
+	new_password = str(random_string)
+
+	db.execute("UPDATE superuser SET password=:new_password WHERE email=:destination_email",
+	{"new_password":new_password, "destination_email":destination_email})
+	db.commit()
+	db.close()
+
+	msg = Message(subject="Inventory-Mgmt-System:Password Reset Request",
+	sender=app.config.get("MAIL_USERNAME"),
+	recipients = [destination_email],
+	body = "Hey " + superuser_name + "," + " You requested for a password Reset for your account.\n"
+	"Your new password is: " + new_password + "\nYou can now login using your new Password." 
+	"\nHave a nice day!" +"\n\n\n" + "Regards" + "\nVikrant Arora" + "\nDeveloper-Inventory Management System" )
+
+	mail.send(msg)	
+
+	alert_type = 'success'
+	flash (f"Your New Password has been sent to Your email address { destination_email }")	
+	return render_template('resetpassworduser.html', alert_type = alert_type)
+
+#	RESET PASSWORD CODE FOR SUPERUSER ENDS HERE 
+		
+
+@app.route("/superuserlogin")
+def superuserlogin():
+	return render_template('superuserlogin.html')
+
+
+@app.route("/newsuperuserlogin",methods=["POST"])
+def newsuperuserlogin():
+
+	person_phone_or_email = request.form.get('EPhone')
+	person_password = request.form.get('Password')
+
+	designation = request.form.get('Designation')
+
+	print('start-start-BEFORE QUERY ')
+	
+	print('end-wdnjkdfjd BEFORE QUERY')
+
+	result = db.execute("SELECT * FROM superuser WHERE designation=:designation",
+	{"designation":designation}).fetchall()
+
+	print('start-start-AFTER QUERY')
+	print(result)
+	print('end-wdnjkdfjd')
+
+	for r in result:
+		phone = r.phone
+		email = r.email
+		password = r.password
+		first_name = r.first_name
+		last_name = r.last_name	
+
+
+	if ((person_phone_or_email == phone or person_phone_or_email == email) and person_password == password):
+		print(f"inside the if condition i,e, CONDITION TRUE")
+		alert_type = 'success'
+		flash (f"Login Successfull! Welcome { first_name }") 
+
+		if designation == 'Head':
+
+			all_products = db.execute("SELECT * FROM products").fetchall()
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()	
+
+			return render_template('allproductshead.html', all_products = all_products, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+		elif designation == 'Store Manager':
+
+			all_products = db.execute("SELECT * FROM products").fetchall()
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
+
+			return render_template('allproductsstoremanager.html', all_products = all_products, alert_type = alert_type , low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+		elif designation == 'Admin':
+
+			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			# low_items_count, critical_items_count = findItemsCount()
+
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
+
+			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops, User Id and Password do not match!")
+		return render_template('superuserlogin.html', alert_type = alert_type)
+
+
+# THE ROUTE /superuserinfoupdate UPDATES THE ENTIRE BIO OF THE SUPERUSER 
+# DEPENDING ON THE designation OF THE SUPERUSER
+
+@app.route("/superuserinfoupdate",methods=["POST"])
+def superuserinfoupdate():
+
+	first_name = request.form.get('FirstName')
+	last_name = request.form.get('LastName')
+	email = request.form.get('Email')
+	phone = request.form.get('Phone')
+
+	password = request.form.get('newpassword')
+	confirm_password = request.form.get('cnewpassword')
+
+	designation = request.form.get('email_Or_Phone_Or_designation')
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	if password == confirm_password:
+		db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation=:designation",
+		{"first_name":first_name, "last_name":last_name, "email":email, "phone":phone, "password":password, "designation":designation})
+		db.commit()
+		db.close()
+
+		alert_type = 'success'
+		flash (f"Your Information Has been successfully Updated { first_name }")
+
+		if designation == 'Head':
+			return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+	
+		elif designation == 'Store Manager':
+			return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+		elif designation == 'Admin':
+			return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+
+	elif password != confirm_password:
+
+		alert_type = 'warning'
+		flash (f"Please Confirm Your Password Properly!")
+
+		if designation == 'Head':
+			return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+	
+		elif designation == 'Store Manager':
+			return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+		elif designation == 'Admin':
+			return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)		
+
+	else:
+		alert_type = 'error'
+		flash (f"OOps, Something went wrong!")
+
+		if designation == 'Head':
+			return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+	
+		elif designation == 'Store Manager':
+			return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+		elif designation == 'Admin':
+			return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)		
+
+
+# THE ROUTE /superuserpasswordupdate UPDATES ONLY USER ID(email and/or phone) OF THE SUPERUSER 
+# DEPENDING ON THE designation OF THE SUPERUSER
+
+@app.route("/superuserpasswordupdate",methods=["POST"])
+def superuserpasswordupdate():
+
+	current_password = request.form.get('current_password')
+
+	password = request.form.get('newpassword')
+	confirm_password = request.form.get('cnewpassword')
+
+	designation = request.form.get('email_Or_Phone_Or_designation')
+
+	# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+	low_items_count, critical_items_count = findItemsCount()
+
+	result = db.execute("SELECT * FROM superuser WHERE designation=:designation",
+	{"designation":designation}).fetchall()
+
+	for r in result:
+		old_password = r.password
+		first_name = r.first_name
+
+
+	if old_password != current_password:
+		alert_type = 'error'
+		flash (f"Sorry, You entered the current password wrong!")
+
+		if designation == 'Head':
+			return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+	
+		elif designation == 'Store Manager':
+			return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+		elif designation == 'Admin':
+			return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	elif old_password == current_password:		
+		if password == confirm_password:
+
+			db.execute("UPDATE superuser SET password=:password WHERE designation=:designation",
+			{"password":password, "designation":designation})
+			db.commit()
+			db.close()
+
+			alert_type = 'success'
+			flash (f"Your Password Has been successfully Updated { first_name }")
+
+			if designation == 'Head':
+				return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+		
+			elif designation == 'Store Manager':
+				return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+			elif designation == 'Admin':
+				return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+
+		elif password != confirm_password:
+
+			alert_type = 'warning'
+			flash (f"Please Confirm Your Password Properly!")
+
+			if designation == 'Head':
+				return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+		
+			elif designation == 'Store Manager':
+				return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+			elif designation == 'Admin':
+				return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)		
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops, Something went wrong!")
+
+		if designation == 'Head':
+			return render_template('updatepasswordhead.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count) 
+	
+		elif designation == 'Store Manager':
+			return render_template('updatepasswordstoremanager.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)	
+
+		elif designation == 'Admin':
+			return render_template('updatepasswordadmin.html',  alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+# WORK FOR ADMIN PANEL STARTS FROM HERE AND FOLLOWING CODE IS RELATED TO ADMIN PANEL
+
+@app.route("/allfacultymembers", methods=['GET'])
+def allfacultymembers():
+
+	all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+	return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members)
+
+
+# THIS IS A VERY IMPORTANT FUNCTION THAT COUNTS THE NUMBER OF FACULTY MEMBERS CURRENTLY ASSIGNED AS THE 
+# TEMPORARY HEAD, FUNCTION RETURNS EITHER 0 OR 1
+
+def temporaryHeadCount():
+
+	temporary_head = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+	# DOING THE ACTUAL COUNTING, SINCE QUERY RETURNS ROWS
+	i = 0
+	count = 0
+	for item in temporary_head:
+		i += 1
+
+	temporary_head_count = i
+
+	return temporary_head_count
+
+
+@app.route("/assigntemporaryhead/<faculty_phone_no>",methods=["GET", "POST"])
+def assigntemporaryhead(faculty_phone_no):
+
+	count = temporaryHeadCount()
+
+	if count == 1:
+
+		temporary_head_info = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_head_info:
+			temporary_head_name = r.name
+			temporary_head_phone = r.phone
+
+		alert_type = 'warning'
+		flash (f"Sorry, You can not assign a new Head because { temporary_head_name } is alredy currently assigned as the Temporary head.")
+		temporary_head_assignment_status = 'Currently-Assigned'
+
+		all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+
+	elif count == 0:
+
+		#EXTRACTING Original-Head INFORMATION TO LATER UPDATE IT AGAIN WHEN THE TEMPORARY HEAD IS REMOVED
+
+		original_head = db.execute("SELECT * FROM superuser WHERE designation = 'Head' ").fetchall()
+
+		for r in original_head:
+			head_first_name = r.first_name
+			head_last_name = r.last_name
+			head_email = r.email
+			head_phone = r.phone
+			head_password = r.password
+
+		#SAVING Original-Head's INFORMATION TO LATER UPDATE IT AGAIN WHEN THE TEMPORARY HEAD IS REMOVED 
+
+		db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Original-Head' ",
+		{"first_name":head_first_name,"last_name":head_last_name,"email":head_email,"phone":head_phone, "password":head_password})
+		db.commit()
+		db.close()	
+
+		#EXTRACTING FACULTY'S DATA FROM regiatrations TABLE TO UPDATE HEAD'S INFO IN THE SUPERUSER TABLE
+
+		temporary_head = db.execute("SELECT * FROM registrations WHERE phone=:faculty_phone_no",
+		{"faculty_phone_no":faculty_phone_no}).fetchall()
+
+		for r in temporary_head:
+			faculty_first_name = r.first_name
+			faculty_last_name = r.last_name
+			faculty_email = r.email
+			faculty_password = r.password
+
+			faculty_department = r.department
+			faculty_designation = r.designation
+
+		assigned_as = 'Head'
+		now = datetime.now()
+		assigned_on = now.strftime("%d-%m-%Y")
+		reg_time = now.strftime("%H:%M:%S")
+
+		full_name = str(faculty_first_name) + " " + str(faculty_last_name)
+
+
+		# THIS QUERY UPDATES THE superuser TABLE WITH THE DATA OF THE FACULTY BEING ASSIGNED AS HEAD
+
+		db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Head' ",
+		{"first_name":faculty_first_name,"last_name":faculty_last_name,"email":faculty_email,"phone":faculty_phone_no, "password":faculty_password})
+		db.commit()
+		db.close()	
+
+		# THIS QUERY CREATES AND SAVES A NEW RECORD IN THE update_records TABLE EVERY TIME 
+		# A FACULTY MEMBER IS ASSIGNED AS HEAD
+
+		db.execute("INSERT INTO update_records(name, department, designation, email, phone, assigned_as, assigned_on) VALUES(:name, :department, :designation, :email, :phone, :assigned_as, :assigned_on)",
+		{"name":full_name,"department":faculty_department,"designation":faculty_designation,"email":faculty_email, "phone":faculty_phone_no,"assigned_as":assigned_as,"assigned_on":assigned_on})
+		db.commit()
+		db.close()
+
+		temporary_head_assignment_status = 'Currently-Assigned'
+		temporary_head_phone = faculty_phone_no
+
+		alert_type = 'success'
+		flash (f"Success, { faculty_first_name } has been assigned as the new head!")
+
+		all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops. Something went wrong!")	
+
+		# PASSING THE FOLLOWING INFORMATION TO MAKE SURE THAT Assignment Status REMAINS CONSISTENT 
+		# IF THERE IS A TEMPORARY HEAD CURRENTLY ASSIGNED
+
+		temporary_head_info = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_head_info:
+			temporary_head_name = r.name    # Name Not Needed Here Actually.
+			temporary_head_phone = r.phone
+
+		temporary_head_assignment_status = 'Currently-Assigned'	
+
+		all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+
+
+@app.route("/removetemporaryhead/<faculty_phone_no>",methods=["GET", "POST"])
+def removetemporaryhead(faculty_phone_no):
+
+	count = temporaryHeadCount()
+
+	if count == 0:
+
+		alert_type = 'warning'
+		flash (f"Sorry, No Faculty Member is Currently assigned as temporary Head as of Now!")
+
+		all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type)
+
+	elif count == 1:
+
+		temporary_head_info = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_head_info:
+			temporary_head_name = r.name    # Name Not Needed Here Actually.
+			temporary_head_phone = r.phone
+
+		if temporary_head_phone != faculty_phone_no:
+
+			alert_type = 'warning'
+			flash (f"Sorry, This Faculty Member is not Currently assigned as the temporary Head!")
+
+			temporary_head_info = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+			for r in temporary_head_info:
+				temporary_head_name = r.name    # Name Not Needed Here Actually.
+				temporary_head_phone = r.phone
+
+			temporary_head_assignment_status = 'Currently-Assigned'
+
+			all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+			return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+		elif temporary_head_phone == faculty_phone_no:	
+
+			original_head = db.execute("SELECT * FROM superuser WHERE designation = 'Original-Head'").fetchall()
+			
+			for r in original_head:
+				head_first_name = r.first_name
+				head_last_name = r.last_name
+				head_email = r.email
+				head_phone = r.phone
+				head_password = r.password	
+
+			#THIS QUERY UPDATES THE superuser TABLE WITH THE DATA OF THE Original-Head IN COLUMN OF Head
+
+			db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Head' ",
+			{"first_name":head_first_name,"last_name":head_last_name,"email":head_email,"phone":head_phone, "password":head_password})
+			db.commit()
+			db.close()	
+
+			#THIS QUERY UPDATES THE removed_on COLUMN OF update_records TABLE WITH THE DATE 
+			# ON WHICH THE FACULTY IS REMOVED FROM ITS STATUS OF TEMPORARY HEAD
+
+			now = datetime.now()
+			removed_on = now.strftime("%d-%m-%Y")
+			reg_time = now.strftime("%H:%M:%S")
+
+			db.execute("UPDATE update_records SET removed_on=:removed_on WHERE phone=:faculty_phone_no",
+			{"removed_on":removed_on, "faculty_phone_no":faculty_phone_no})
+			db.commit()
+			db.close()
+
+			temporary_head_assignment_status = 'Not-Assigned'
+			temporary_head_phone = faculty_phone_no
+
+			alert_type = 'success'
+			flash (f"Success, { head_first_name } has been Re-Assigned as the new head!")
+
+			all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+			return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops. Something went wrong!")	
+
+		# PASSING THE FOLLOWING INFORMATION TO MAKE SURE THAT Assignment Status REMAINS CONSISTENT 
+		# IF THERE IS A TEMPORARY HEAD CURRENTLY ASSIGNED AND IF CONTROL DOES NOT ENTER EITHER OF if and elif SO
+		# THE PERSON WHO WAS ASSIGNED AS TEMPORARY HEAD, HIS Assignment status SHOULD STILL APPEAR 
+		# AS 'currently-Assigned' BECAUSE REMOVE QUERY DID NOT RUN 
+
+		temporary_head_info = db.execute("SELECT * FROM update_records where designation = 'Faculty' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_head_info:
+			temporary_head_name = r.name    # Name Not Needed Here Actually.
+			temporary_head_phone = r.phone
+
+		temporary_head_assignment_status = 'Currently-Assigned'	
+
+		all_faculty_members = db.execute(" SELECT * FROM registrations WHERE designation = 'Faculty' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allfacultymembers.html', all_faculty_members = all_faculty_members, alert_type = alert_type, temporary_head_phone = temporary_head_phone, temporary_head_assignment_status = temporary_head_assignment_status)
+
+
+# THE FOLLOWING CODE FOCUSES ON THE AUTHORITY UPDATE FEATURE OF CLERK TO STORE MANAGER
+
+@app.route("/allclerks", methods=['GET'])
+def allclerks():
+
+	all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+	return render_template('allclerks.html', all_clerks = all_clerks)
+
+
+# THIS IS A VERY IMPORTANT FUNCTION THAT COUNTS THE NUMBER OF CLERKS CURRENTLY ASSIGNED AS THE 
+# TEMPORARY STORE MANAGER, FUNCTION RETURNS EITHER 0 OR 1
+
+def temporaryStoreManagerCount():
+
+	temporary_store_manager = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+	# DOING THE ACTUAL COUNTING, SINCE QUERY RETURNS ROWS
+	i = 0
+	count = 0
+	for item in temporary_store_manager:
+		i += 1
+
+	temporary_store_manager_count = i
+
+	return temporary_store_manager_count
+
+
+@app.route("/assigntemporarystoremanager/<clerk_phone_no>",methods=["GET", "POST"])
+def assigntemporarystoremanager(clerk_phone_no):
+
+	count = temporaryStoreManagerCount()
+
+	if count == 1:
+
+		temporary_store_manager_info = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_store_manager_info:
+			temporary_store_manager_name = r.name
+			temporary_store_manager_phone = r.phone
+
+		alert_type = 'warning'
+		flash (f"Sorry, You can not assign a new Store Manager because { temporary_store_manager_name } is already currently assigned as the Temporary Store Manager.")
+		temporary_store_manager_assignment_status = 'Currently-Assigned'
+
+		all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+
+	elif count == 0:
+
+		#EXTRACTING Original-Store-Manager INFORMATION TO LATER UPDATE IT AGAIN WHEN THE TEMPORARY STORE MANAGER IS REMOVED
+
+		original_store_manager = db.execute("SELECT * FROM superuser WHERE designation = 'Store Manager' ").fetchall()
+
+		for r in original_store_manager:
+			store_manager_first_name = r.first_name
+			store_manager_last_name = r.last_name
+			store_manager_email = r.email
+			store_manager_phone = r.phone
+			store_manager_password = r.password
+
+		#SAVING Original-Store-Manager's INFORMATION TO LATER UPDATE IT AGAIN WHEN THE TEMPORARY STORE MANAGER IS REMOVED 
+
+		db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Original-Store-Manager' ",
+		{"first_name":store_manager_first_name,"last_name":store_manager_last_name,"email":store_manager_email,"phone":store_manager_phone, "password":store_manager_password})
+		db.commit()
+		db.close()	
+
+		#EXTRACTING CLERK'S DATA FROM regiatrations TABLE TO UPDATE STORE MANAGER'S INFO IN THE SUPERUSER TABLE
+
+		temporary_store_manager = db.execute("SELECT * FROM registrations WHERE phone=:clerk_phone_no",
+		{"clerk_phone_no":clerk_phone_no}).fetchall()
+
+		for r in temporary_store_manager:
+			clerk_first_name = r.first_name
+			clerk_last_name = r.last_name
+			clerk_email = r.email
+			clerk_password = r.password
+
+			clerk_department = r.department
+			clerk_designation = r.designation
+
+		assigned_as = 'Store Manager'
+		now = datetime.now()
+		assigned_on = now.strftime("%d-%m-%Y")
+		# reg_time = now.strftime("%H:%M:%S")
+
+		full_name = str(clerk_first_name) + " " + str(clerk_last_name)
+
+
+		# THIS QUERY UPDATES THE superuser TABLE WITH THE DATA OF THE CLERK BEING ASSIGNED AS STORE MANAGER
+
+		db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Store Manager' ",
+		{"first_name":clerk_first_name,"last_name":clerk_last_name,"email":clerk_email,"phone":clerk_phone_no, "password":clerk_password})
+		db.commit()
+		db.close()	
+
+		# THIS QUERY CREATES AND SAVES A NEW RECORD IN THE update_records TABLE EVERY TIME 
+		# A CLERK IS ASSIGNED AS STORE MANAGER
+
+		db.execute("INSERT INTO update_records(name, department, designation, email, phone, assigned_as, assigned_on) VALUES(:name, :department, :designation, :email, :phone, :assigned_as, :assigned_on)",
+		{"name":full_name,"department":clerk_department,"designation":clerk_designation,"email":clerk_email, "phone":clerk_phone_no,"assigned_as":assigned_as,"assigned_on":assigned_on})
+		db.commit()
+		db.close()
+
+		temporary_store_manager_assignment_status = 'Currently-Assigned'
+		temporary_store_manager_phone = clerk_phone_no
+
+		alert_type = 'success'
+		flash (f"Success, { full_name } has been assigned as the new store manager!")
+
+		all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops. Something went wrong!")	
+
+		# PASSING THE FOLLOWING INFORMATION TO MAKE SURE THAT Assignment Status REMAINS CONSISTENT 
+		# IF THERE IS A TEMPORARY STORE MANAGER CURRENTLY ASSIGNED
+
+		temporary_store_manager_info = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_store_manager_info:
+			temporary_store_manager_name = r.name    # Name Not Needed Here Actually.
+			temporary_store_manager_phone = r.phone
+
+		temporary_store_manager_assignment_status = 'Currently-Assigned'	
+
+		all_clerks= db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+
+
+@app.route("/removetemporarystoremanager/<clerk_phone_no>",methods=["GET", "POST"])
+def removetemporarystoremanager(clerk_phone_no):
+
+	count = temporaryStoreManagerCount()
+
+	if count == 0:
+
+		alert_type = 'warning'
+		flash (f"Sorry, No Clerk is Currently assigned as temporary Store Manager as of Now!")
+
+		all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type)
+
+	elif count == 1:
+
+		temporary_store_manager_info = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_store_manager_info:
+			temporary_store_manager_name = r.name    # Name Not Needed Here Actually.
+			temporary_store_manager_phone = r.phone
+
+		if temporary_store_manager_phone != clerk_phone_no:
+
+			alert_type = 'warning'
+			flash (f"Sorry, This Clerk is not Currently assigned as the temporary Store Manager!")
+
+			temporary_store_manager_info = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+			for r in temporary_store_manager_info:
+				temporary_store_manager_name = r.name    # Name Not Needed Here Actually.
+				temporary_store_manager_phone = r.phone
+
+			temporary_store_manager_assignment_status = 'Currently-Assigned'
+
+			all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+			return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+		elif temporary_store_manager_phone == clerk_phone_no:	
+
+			original_store_manager = db.execute("SELECT * FROM superuser WHERE designation = 'Original-Store-Manager' ").fetchall()
+			
+			for r in original_store_manager:
+				store_manager_first_name = r.first_name
+				store_manager_last_name = r.last_name
+				store_manager_email = r.email
+				store_manager_phone = r.phone
+				store_manager_password = r.password	
+
+			#THIS QUERY UPDATES THE superuser TABLE WITH THE DATA OF THE Original-Store-Manager IN COLUMN OF STORE MANAGER
+
+			db.execute("UPDATE superuser SET first_name=:first_name, last_name=:last_name, email=:email, phone=:phone, password=:password WHERE designation = 'Store Manager' ",
+			{"first_name":store_manager_first_name,"last_name":store_manager_last_name,"email":store_manager_email,"phone":store_manager_phone, "password":store_manager_password})
+			db.commit()
+			db.close()	
+
+			#THIS QUERY UPDATES THE removed_on COLUMN OF update_records TABLE WITH THE DATE 
+			# ON WHICH THE CLERK IS REMOVED FROM ITS STATUS OF TEMPORARY STORE MANAGER
+
+			now = datetime.now()
+			removed_on = now.strftime("%d-%m-%Y")
+			reg_time = now.strftime("%H:%M:%S")
+
+			db.execute("UPDATE update_records SET removed_on=:removed_on WHERE phone=:clerk_phone_no",
+			{"removed_on":removed_on, "clerk_phone_no":clerk_phone_no})
+			db.commit()
+			db.close()
+
+			temporary_store_manager_assignment_status = 'Not-Assigned'
+			temporary_store_manager_phone = clerk_phone_no
+
+			alert_type = 'success'
+			flash (f"Success, { store_manager_first_name } has been Re-Assigned as the new store manager!")
+
+			all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+			return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+	else:
+		alert_type = 'error'
+		flash (f"Oops. Something went wrong!")	
+
+		# PASSING THE FOLLOWING INFORMATION TO MAKE SURE THAT Assignment Status REMAINS CONSISTENT 
+		# IF THERE IS A TEMPORARY STORE MANAGER CURRENTLY ASSIGNED AND IF CONTROL DOES NOT ENTER EITHER OF if and elif SO
+		# THE PERSON WHO WAS ASSIGNED AS TEMPORARY STORE MANAGER, HIS Assignment status SHOULD STILL APPEAR 
+		# AS 'currently-Assigned' BECAUSE REMOVE QUERY DID NOT RUN 
+
+		temporary_store_manager_info = db.execute("SELECT * FROM update_records where designation = 'Clerk' AND removed_on = 'Not-Removed'").fetchall()
+
+		for r in temporary_store_manager_info:
+			temporary_store_manager_name = r.name    # Name Not Needed Here Actually.
+			temporary_store_manager_phone = r.phone
+
+		temporary_store_manager_assignment_status = 'Currently-Assigned'	
+
+		all_clerks = db.execute(" SELECT * FROM registrations WHERE designation = 'Clerk' AND reg_status = 'Approved' ").fetchall()
+		return render_template('allclerks.html', all_clerks = all_clerks, alert_type = alert_type, temporary_store_manager_phone = temporary_store_manager_phone, temporary_store_manager_assignment_status = temporary_store_manager_assignment_status)
+
+
+
+@app.route("/authorizationupdaterecords", methods=["GET"])
+def authorizationupdaterecords():
+
+	authorization_update_records = db.execute(" SELECT * FROM update_records ").fetchall()
+	return render_template('authorizationupdaterecords.html', authorization_update_records = authorization_update_records)
 
 # @app.route("/test")
 # def test():

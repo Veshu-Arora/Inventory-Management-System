@@ -57,15 +57,16 @@
 
 <body>
 
-    <div class="topnav" id="myTopnav">
-        <!-- <a><i class="fas fa-home"></i><a -->
-        <!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->   
-        <a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="#" >Add Category</a>
-        <a href="#">Issued Items</a>
-        <a href="#">All Items</a>
-        <a href="#">Critical / Low Items</a>
-        <a href="#">Requests</a>
+    <div class="topnav" id="myTopnav">  
+        <a class="active" href="/allproductsstoremanager"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="/addcategory" >Add Category</a>
+        <a href="/allcategories">All Categories</a>
+        <a href="/addproduct">Add Product</a>
+        <a href="/issueditems">Issued Items</a>
+        <!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
+        <a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
+        <a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
+        <a href="/allrequests">All Requests</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
             <!-- <i class="fa fa-bars"></i> -->
 
@@ -78,7 +79,7 @@
         </a>
         <div class="topnav-right">
             <a href="#">Logout</a>
-            <a href="#">Update</a>
+            <a href="/updatepasswordstoremanager">Update</a>
             <!-- <a href="#">Settings</a> -->
         </div>
     </div>
@@ -147,6 +148,8 @@
                     <th>Request Date</th>
                     <th>Request Status</th>
                     <th>Reason</th>
+                    <th>Mark Status</th>
+                    <th>Issue Permission</th>
                     <th style="text-align: right;">Accept or reject Requests</th>
                     <th style="text-align: right;">Issue or Revert Products</th>
                     
@@ -166,6 +169,8 @@
                     <td>{{ item.request_date }}</td>
                     <td>{{ item.request_status }}</td>
                     <td>{{ item.reason }}</td>
+                    <td>{{ item.product_mark_status }}</td>
+                    <td>{{ item.permission }}</td>
                     <td style="text-align: right;"><a href="{{ url_for('acceptrequest', product_request_id=item.id)}}"><button type="button" class="btn btn-secondary">ACCEPT</button></a>
                     <button type="button" class="btn btn-secondary" onclick="openForm(); sendProductId('{{ item.id }}');">REJECT</button></td>
 
@@ -177,36 +182,6 @@
                 {% else %}
                 No results found
                 {% endif %}
-
-                <!-- <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td>XYZ</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ACCEPT</button>
-                        <button type="button" class="btn btn-secondary delete-btn">REJECT</button></td>
-                </tr>
-
-                <tr>
-                    <td>AA</td>
-                    <td>BB</td>
-                    <td>CC</td>
-                    <td>DD</td>
-                    <td>EE</td>
-                    <td>FF</td>
-                    <td>GG</td>
-                    <td>HH</td>
-                    <td>II</td>
-                    <td>XYZ</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary">ACCEPT</button>
-                        <button type="button" class="btn btn-secondary delete-btn">REJECT</button></td>
-                </tr> -->
 
             </table>
         </div>
@@ -243,16 +218,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- <div class="cat-radio-btn">
-    <input type="radio" id="Not-available" name="Reason" value="Not-available">
-    <label for="Not-available">Not-available</label><br>
-    </div> -->
-
-    <!-- <input type="text" placeholder="Some Other Reason" name="Other Reason" required> -->
-
-    <!-- <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required> -->
 
     <div class = "signup-btn" style="text-align: left;">
         <button type="submit" class="" style="font-size: 13px;">Ok</button>
