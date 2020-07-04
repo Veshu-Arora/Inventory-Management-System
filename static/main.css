@@ -3,6 +3,8 @@
 	margin:0;
 	/*this is very important to adjust padding and margin*/
 	box-sizing: border-box;
+	/*font-family: 'Poiret One', cursive;*/
+
 }
 
 .topnav a:hover{
@@ -179,8 +181,8 @@
 }
 
 .container .signup .image{
-	height: 120px;
-	width: 120px;
+	height: 135px;
+	width: 135px;
 
 }
 
@@ -197,9 +199,14 @@
 	}
 
 	.container .signup .image{
-		height: 10vh;
-		width: 70%;
 		margin-bottom: 22px;
+
+	}
+
+
+	.container .signup .image{
+	height: 150px;
+	width: 150px;
 
 	}
 
@@ -216,7 +223,7 @@
 	overflow-y: scroll;
 	background-color: #696969;
 	color: white;
-	margin-top: 2.8vh;
+	margin-top: 3.8vh;
 }
 
 @media(max-width: 600px){
@@ -240,11 +247,20 @@
 }
 
 .container .for-align{
-	display: flex;
-	flex-direction: column;
+	display: block;
+	/*flex-direction: column;*/
 }
 
 .container .for-align div h3{
 	margin-top: 1vh;
 }
 
+.info p{
+	line-height: 1.35;
+	text-align: left;
+	padding-left: 8px;
+	font-weight: 550;
+	font-size: 18px;
+	font-family: 'Poiret One', cursive;
+	color: white;
+}

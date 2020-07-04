@@ -3,14 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PROXY TAG FOR PASSING JINJA VARIABLE TO JAVASCRIPT FUNCTION -->
-    <meta id="qty_available" data-qty_available="{{ qty_available }}">
-    <!-- PROXY TAG ENDS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <!-- JAVASCRIPT LINK FOR TOOLTIP TEXT STARTS -->
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> --> 
-    <!-- JAVASCRIPT LINK FOR TOOLTIP TEXT ENDS -->
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
@@ -25,7 +18,7 @@
 
     <!-- Bootstrap Links Ends  -->
 
-    <title>Home</title>
+    <title>Critical Items</title>
 
     <script>
         function myFunction() {
@@ -69,7 +62,7 @@
 
         </a>
         <div class="topnav-right">
-            <a href="#">Logout</a>
+            <a href="/logoutsuperuser">Logout</a>
             <a href="/updatepasswordstoremanager">Update</a>
             <!-- <a href="#">Settings</a> -->
         </div>

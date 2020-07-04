@@ -145,10 +145,8 @@
 
         </a>
         <div class="topnav-right">
-            <a href="#">Logout</a>
+            <a href="/logoutgeneraluser">Logout</a>
             <a href="/updatepassword">Update</a>
-            <a href=""><i class="fa fa-fw fa-bell-on"></i></a>
-            <!-- <a href="#">Settings</a> -->
         </div>
     </div>
 
@@ -284,7 +282,7 @@
         </form>
 
 
-        <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER--IMPORTANT FORM -->
+        <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER, OR REQUESTED BY USER, OR RETURNED BY USER--IMPORTANT FORM -->
         <form id="requesteditems" method="POST" style="display: none;">       
             <div>
                 <input id = "receive_email_or_phone" type="hidden" name="email_Or_Phone" readonly>
@@ -294,7 +292,7 @@
         <!-- THIS FORM IS USED TO SEND USER ID TO BE USED WHEN REDIRECTING TO HOME i.e. ALLPRODUCTSUSER.HTML FROM OTHER PAGES SUCH AS ISSUED ITEMS AND OTHERS -->
         <form action = "/homeredirect" id="homeredirectform" method="POST" style="display: none;">       
             <div>
-                <input id = "user_email_or_phone" type = "hidden" name="user_email_or_phone">
+                <input id = "user_email_or_phone" type = "hidden" name="user_email_or_phone" readonly>
             </div>
         </form>
 

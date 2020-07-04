@@ -17,7 +17,7 @@
 
     <!-- Bootstrap Links Ends  -->
 
-    <title>Home</title>
+    <title>Requested Items</title>
 
     <script>
         function myFunction() {
@@ -59,7 +59,7 @@
 
         </a>
         <div class="topnav-right">
-            <a href="#">Logout</a>
+            <a href="/logoutsuperuser">Logout</a>
             <a href="/updatepasswordhead">Update</a>
             <!-- <a href=""><i class="fa fa-fw fa-bell-on"></i></a> -->
         </div>
@@ -154,10 +154,8 @@
                     <td>{{ item.product_mark_status }}</td>
                     <td>{{ item.permission }}</td>
                     {% if item.product_mark_status  == 'Marked' %}
-                        <td style="text-align: right;"><a href="{{ url_for('grantissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">GRANT
-                        </button></a>
-                        <a href="{{ url_for('denyissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">DENY
-                        </button></a>
+                        <td style="text-align: right;"><a href="{{ url_for('grantissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">GRANT</button></a>
+                        <a href="{{ url_for('denyissuepermission', product_request_id=item.id)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">DENY</button></a>
                         </td>
                     {% else %}
                         <td style="text-align: right;">Product Not Marked</td>    
@@ -175,12 +173,12 @@
         <!-- Javascript to show the effect of deleting the table record using "REJECT" button -->
         <!-- THIS JAVASCRIPT IS NOT BEING USED AS OF NOW BUT MAY COME IN USE LATER SOMETIME IN FUTURE -->
 
-        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
         <script>
             $('#customers').on('click', '.delete-btn', function()  {
                 $(this).closest('tr').remove();
             });
-        </script>
+        </script> -->
 
         <!-- Javascript Ends -->
     </center>
