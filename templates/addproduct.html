@@ -7,7 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
 	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<title>Add products</title>
+	<title>Add Product</title>
 
 	<!-- CSS FOR LABEL -->
 
@@ -52,6 +52,20 @@
 		x.classList.toggle("change");
 		}
 	</script>
+
+	<!-- <style type="text/css">
+		@media screen and (max-width: 600px){
+			.title{
+	        	<span>
+	            Inventory Management
+	            System <br>
+	            Add Products To<br>
+	            Database
+	            </span>
+	        }
+    	}
+	</style> -->
+
 </head>
 
 <body>
@@ -84,18 +98,12 @@
 
     <div class="wrapper">
         <div class="title">
-        	<!-- <span>
+        	<span>
             Inventory Management
             System <br>
-            Faculty<br>
-            Signup
-            </span> -->
-            <p>
-            Add Products
-            To <br>
-            Database<br>
-            </p>
-
+            Add Products<br>
+            To Database
+            </span>
         </div>
 
         {% with messages = get_flashed_messages() %}

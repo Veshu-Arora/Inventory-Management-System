@@ -79,6 +79,7 @@
         <a href = '#' onclick="submitForm('/userrequesteditems')">Requested Items</a>
         <a href = '#' onclick="submitForm('/userissueditems')">Issued Items</a>
         <a href = '#' onclick="submitForm('/userreturneditems')">Returned Items</a>
+        <a href = '#' onclick="submitForm('/userrejectedrequests')">Rejected Requests</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
             <!-- <i class="fa fa-bars"></i> -->
 
@@ -143,7 +144,7 @@
     {% endwith %}
 
     <center>
-        <h1>These are all the items that you were issued from the Store </h1>
+        <h1>These are the records of all the Approved requests and issued Items</h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>

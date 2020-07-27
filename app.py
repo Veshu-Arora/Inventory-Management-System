@@ -41,6 +41,22 @@ DATABASE_URL="postgres://wainhlvxrgqwoo:9902be4ffc31450a1e9924f03879d1788cfb7fa6
 # Set up database
 engine = create_engine(DATABASE_URL)
 db = scoped_session(sessionmaker(bind=engine))
+
+# department = {
+# 	'0' : 'B.Tech(IT)',
+# 	'1' : 'B.Tech(CSE)',
+# 	'2' : 'B.Tech(Mechanical)',
+# 	'3' : 'B.Tech(ECE)',
+# 	'4' : 'B.Tech(IN)',
+# 	'5' : 'B.Sc(Chemistry)',
+# 	'6' : 'B.Sc(Physics)',
+# 	'7' : 'B.Sc(Microbiology)',
+# 	'8' : 'M.Sc(Chemistry)',
+# 	'9' : 'M.Sc(Physics)',
+# 	'10' : 'M.Sc(Microbiology)',
+# 	'11' : 'B.J.M.C.'
+	
+# }
  
 
 # brand = {
@@ -211,19 +227,19 @@ def index():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 
 
 	else:	# RUNS WHEN USER IS LOGGED OUT ,  # RUNS WHEN SUPERUSER IS LOGGED OUT
-		return render_template('index.html')
+		return render_template('newlandingpage.html')
 
 @app.route("/signup",methods=['POST', 'GET'])
 def signup():
@@ -282,15 +298,15 @@ def signup():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 
 
 	elif not 'User_ID' in session:
@@ -326,6 +342,22 @@ def signup():
 
 @app.route("/newregistration",methods=["POST", "GET"])
 def newregistration():
+
+	department = {
+	'0' : 'B.Tech(IT)',
+	'1' : 'B.Tech(CSE)',
+	'2' : 'B.Tech(Mechanical)',
+	'3' : 'B.Tech(ECE)',
+	'4' : 'B.Tech(IN)',
+	'5' : 'B.Sc(Chemistry)',
+	'6' : 'B.Sc(Physics)',
+	'7' : 'B.Sc(Microbiology)',
+	'8' : 'M.Sc(Chemistry)',
+	'9' : 'M.Sc(Physics)',
+	'10' : 'M.Sc(Microbiology)',
+	'11' : 'B.J.M.C.'
+	
+}
 
 	if 'SuperUser_ID' in session:  # MEANS SUPERUSER IS ALREADY LOGGED IN
 
@@ -364,15 +396,15 @@ def newregistration():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 
 
 	elif not 'User_ID' in session:  # MEANS USER IS NOT LOGGED IN
@@ -417,7 +449,7 @@ def newregistration():
 
 				elif password != cpassword:
 					alert_type = 'warning'
-					flash( f"Please Confirn Your Pasword Properly!")
+					flash( f"Please Confirm Your Pasword Properly!")
 					return render_template('signup.html', alert_type = alert_type, department = department)
 						
 			else:
@@ -454,16 +486,41 @@ def newregistration():
 		first_name = first_name, last_name = last_name, department = department, registered_as = registered_as)			
 
 
-@app.route("/allregistrations")
-def allregistrations():
+@app.route("/pendingregistrations", methods = ["GET"])
+def pendingregistrations():
 
 	if 'SuperUser_ID' in session:
 
-		all_registrations = db.execute("SELECT * FROM registrations").fetchall()
-		return render_template('allregistrations.html', all_registrations = all_registrations)
+		pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
+		return render_template('pendingregistrations.html', pending_registrations = pending_registrations)
 
 	else:
-		return redirect(url_for('index'))	
+		return redirect(url_for('index'))
+
+
+@app.route("/approvedregistrations", methods = ["GET"])
+def approvedregistrations():
+
+	if 'SuperUser_ID' in session:
+
+		approved_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Approved' ").fetchall()
+		return render_template('approvedregistrations.html', approved_registrations = approved_registrations)
+
+	else:
+		return redirect(url_for('index'))
+
+
+@app.route("/rejectedregistrations", methods = ["GET"])
+def rejectedregistrations():
+
+	if 'SuperUser_ID' in session:
+
+		rejected_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Not-Approved' ").fetchall()
+		return render_template('rejectedregistrations.html', rejected_registrations = rejected_registrations)
+
+	else:
+		return redirect(url_for('index'))		
+
 
 
 @app.route("/acceptregistration/<person_phone_no>",methods=["GET", "POST"])
@@ -481,10 +538,32 @@ def acceptregistration(person_phone_no):
 		{"new_status":new_status, "confirmed_on":confirmation_date, "phone":person_phone_no})
 		db.commit()
 		db.close()
-		return redirect(url_for('allregistrations'))
+		return redirect(url_for('pendingregistrations'))
 
 	else:
-		return redirect(url_for('index'))	
+		return redirect(url_for('index'))
+
+
+@app.route("/acceptrejectedregistration/<person_phone_no>",methods=["GET", "POST"])
+def acceptrejectedregistration(person_phone_no):
+
+	if 'SuperUser_ID' in session:
+
+		now = datetime.now()
+		confirmation_date = now.strftime("%d-%m-%Y")
+		confirmation_time = now.strftime("%H:%M:%S")
+
+		new_status = 'Approved'
+		
+		db.execute("UPDATE registrations SET reason = NULL, reg_status=:new_status, confirmed_on=:confirmed_on WHERE phone=:phone",
+		{"new_status":new_status, "confirmed_on":confirmation_date, "phone":person_phone_no})
+		db.commit()
+		db.close()
+		return redirect(url_for('rejectedregistrations'))
+
+	else:
+		return redirect(url_for('index'))
+
 
 
 @app.route("/rejectregistration",methods=["POST", "GET"])
@@ -506,10 +585,35 @@ def rejectregistration():
 		db.commit()
 		db.close()
 
-		return redirect(url_for('allregistrations'))
+		return redirect(url_for('pendingregistrations'))
 
 	else:
 		return redirect(url_for('index'))	
+
+
+@app.route("/rejectapprovedregistration",methods=["POST", "GET"])
+def rejectapprovedregistration():
+
+	if 'SuperUser_ID' in session:
+
+		now = datetime.now()
+		confirmation_date = now.strftime("%d-%m-%Y")
+		confirmation_time = now.strftime("%H:%M:%S")
+
+		person_phone_no = request.args.get('Person_phone_no')
+		rejection_reason = request.args.get('Reason')
+
+		new_status = 'Not-Approved'
+
+		db.execute("UPDATE registrations SET reg_status=:new_status, reason=:reason, confirmed_on=:confirmed_on WHERE phone=:person_phone_no",
+		{"new_status":new_status, "reason":rejection_reason, "confirmed_on":confirmation_date, "person_phone_no":person_phone_no})
+		db.commit()
+		db.close()
+
+		return redirect(url_for('approvedregistrations'))
+
+	else:
+		return redirect(url_for('index'))		
 
 
 @app.route("/login", methods=['POST', 'GET'])
@@ -577,15 +681,15 @@ def login():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)		
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)		
 
 
 	else:
@@ -634,15 +738,15 @@ def newlogin():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 
 
 	elif not 'User_ID' in session:  # MEANS USER IN NOT LOGGED IN
@@ -653,7 +757,7 @@ def newlogin():
 			person_phone_or_email = request.form['EPhone']
 			person_password = request.form.get('Password')
 
-			login_as = request.form.get('Designation')
+			# login_as = request.form.get('Designation')
 			print("!!!!!CHECKING STARTS HERE-PRINTING UDER ID!!!!!!")
 			print(person_phone_or_email)
 			print('NOW DATABASE QUERY WILL RUN')
@@ -671,60 +775,54 @@ def newlogin():
 				department = r.department
 				registered_as = r.designation
 
-			if login_as == registered_as:
-				if registration_status == 'Pending':
-					alert_type = 'info'
-					flash (f"Sorry { first_name }, You can not login because your registration request has not yet been Approved!")
-					return render_template('login.html', alert_type = alert_type)
+			if registration_status == 'Pending':
+				alert_type = 'info'
+				flash (f"Sorry { first_name }, You can not login because your registration request has not yet been Approved!")
+				return render_template('login.html', alert_type = alert_type)
 
-				elif registration_status == 'Not-Approved':
-					alert_type = 'warning'
-					flash (f"Sorry { first_name }, You can not login because your registration request has been Rejected!")
-					return render_template('login.html', alert_type = alert_type)
+			elif registration_status == 'Not-Approved':
+				alert_type = 'warning'
+				flash (f"Sorry { first_name }, You can not login because your registration request has been Rejected!")
+				return render_template('login.html', alert_type = alert_type)
 
-				elif registration_status == 'Approved':
-					print('INSIDE CONDITION APPROVED')
-					if request.method == 'POST':
-						print('CHECKED METHOD = POST')
-						if ((person_phone_or_email == phone or person_phone_or_email == email) and person_password == password):
-							print('USER VERIFIED')
-							# User_ID = request.form['EPhone']
-							User_ID = person_phone_or_email
-							session['User_ID'] = User_ID	 # CREATING A SESSION OBJECT FOR GENERAL USER
+			elif registration_status == 'Approved':
+				print('INSIDE CONDITION APPROVED')
+				if request.method == 'POST':
+					print('CHECKED METHOD = POST')
+					if ((person_phone_or_email == phone or person_phone_or_email == email) and person_password == password):
+						print('USER VERIFIED')
+						# User_ID = request.form['EPhone']
+						User_ID = person_phone_or_email
+						session['User_ID'] = User_ID	 # CREATING A SESSION OBJECT FOR GENERAL USER
 
-							print("PRINTING SESSION VARIABLE")
-							print(User_ID)
-							print('PRINTING COMPLETE')
+						print("PRINTING SESSION VARIABLE")
+						print(User_ID)
+						print('PRINTING COMPLETE')
 
-							alert_type = 'success'
-							flash (f"Login Successfull! Welcome { first_name }") 
-							# return render_template('login.html', alert_type = alert_type)
-							all_products = db.execute("SELECT * FROM products").fetchall()
-							return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, 
-							first_name = first_name, last_name = last_name, department = department, registered_as = registered_as)
-						
-						else:	
-							alert_type = 'error'
-							flash (f"Oops, User Id and Password do not match!")	
-							return render_template('login.html', alert_type = alert_type)	
+						alert_type = 'success'
+						flash (f"Login Successfull! Welcome { first_name }") 
+						# return render_template('login.html', alert_type = alert_type)
+						all_products = db.execute("SELECT * FROM products").fetchall()
+						return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, 
+						first_name = first_name, last_name = last_name, department = department, registered_as = registered_as)
+					
+					else:	
+						alert_type = 'error'
+						flash (f"Oops, User Id and Password do not match!")	
+						return render_template('login.html', alert_type = alert_type)	
 
+				else:
+					if 'User_ID' in session:
+
+						alert_type = 'info'
+						flash (f" Hey { first_name }, You are alreadyyyyyyy logged in!") 
+
+						all_products = db.execute("SELECT * FROM products").fetchall()
+						return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, 
+						first_name = first_name, last_name = last_name, department = department, registered_as = registered_as)
+					
 					else:
-						if 'User_ID' in session:
-
-							alert_type = 'info'
-							flash (f" Hey { first_name }, You are alreadyyyyyyy logged in!") 
-
-							all_products = db.execute("SELECT * FROM products").fetchall()
-							return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, 
-							first_name = first_name, last_name = last_name, department = department, registered_as = registered_as)
-						
-						else:
-							return render_template('index.html')		
-
-			elif login_as != registered_as:
-				alert_type = 'error'
-				flash (f"Sorry { first_name }, you can not login as { login_as } because you are registered as { registered_as }.")
-				return render_template('login.html', alert_type = alert_type)		
+						return render_template('index.html')				
 
 			else:	
 				alert_type = 'error'
@@ -790,15 +888,8 @@ def homeredirect():							  # /allproductsuser. And because we just can not allo
 		if request.method == 'POST':
 			person_phone_or_email = request.form.get('user_email_or_phone')
 
-			print('!!!!!!GETTING USER ID FROM NAV BAR SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
 		else:	
 			person_phone_or_email = session['User_ID']
-
-			print('!!!!!!GETTING USER ID IN BOTH CASES SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
 
 		result = db.execute("SELECT * FROM registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
 		{"person_phone_or_email":person_phone_or_email}).fetchall()
@@ -835,15 +926,47 @@ def resetpasswordsuperuser():
 @app.route("/updatepassword", methods = ["GET"])
 def updatepassword():
 
+	department = {
+	'0' : 'B.Tech(IT)',
+	'1' : 'B.Tech(CSE)',
+	'2' : 'B.Tech(Mechanical)',
+	'3' : 'B.Tech(ECE)',
+	'4' : 'B.Tech(IN)',
+	'5' : 'B.Sc(Chemistry)',
+	'6' : 'B.Sc(Physics)',
+	'7' : 'B.Sc(Microbiology)',
+	'8' : 'M.Sc(Chemistry)',
+	'9' : 'M.Sc(Physics)',
+	'10' : 'M.Sc(Microbiology)',
+	'11' : 'B.J.M.C.'
+	
+	}
+
 	if 'User_ID' in session:
 
-		return render_template('updatepassword.html')
+		return render_template('updatepassword.html', department = department)
 
 	else:
 		return redirect(url_for('index'))	
 
 @app.route("/passwordupdate",methods=["POST"])
 def passwordupdate():
+
+	department = {
+	'0' : 'B.Tech(IT)',
+	'1' : 'B.Tech(CSE)',
+	'2' : 'B.Tech(Mechanical)',
+	'3' : 'B.Tech(ECE)',
+	'4' : 'B.Tech(IN)',
+	'5' : 'B.Sc(Chemistry)',
+	'6' : 'B.Sc(Physics)',
+	'7' : 'B.Sc(Microbiology)',
+	'8' : 'M.Sc(Chemistry)',
+	'9' : 'M.Sc(Physics)',
+	'10' : 'M.Sc(Microbiology)',
+	'11' : 'B.J.M.C.'
+	
+	}
 
 	if "User_ID" in session:
 
@@ -858,7 +981,7 @@ def passwordupdate():
 		if old_password != current_password:
 			alert_type = 'error'
 			flash (f"Sorry, You entered the current password wrong!")
-			return render_template('updatepassword.html', alert_type = alert_type)
+			return render_template('updatepassword.html', alert_type = alert_type, department = department)
 
 		elif old_password == current_password:	
 			if new_password == confirm_new_password:
@@ -868,20 +991,86 @@ def passwordupdate():
 				db.close()
 				alert_type = 'success'
 				flash (f"Your password has been updated successfully !")
-				return render_template('updatepassword.html', alert_type = alert_type)	
+				return render_template('updatepassword.html', alert_type = alert_type, department = department)	
 		
 			elif new_password != confirm_new_password:
 				alert_type = 'error'
 				flash (f"Please Confirm your New password Properly!")	
-				return render_template('updatepassword.html', alert_type = alert_type)	
+				return render_template('updatepassword.html', alert_type = alert_type, department = department)	
 
 		else:
 			alert_type = 'error'
 			flash (f"Oops, Something went wrong!")	
-			return render_template('updatepassword.html', alert_type = alert_type)	
+			return render_template('updatepassword.html', alert_type = alert_type, department = department)	
 
 	else:
 		return redirect(url_for('index'))	
+
+
+
+# THE ROUTE /infoupdate UPDATES THE ENTIRE BIO OF THE GENERAL USER i.e. Faculty , Clerk, Sweeper and Lab-Assistant 
+# DEPENDING ON THE designation OF THE USER
+
+@app.route("/infoupdate",methods=["POST"])
+def infoupdate():
+
+	department = {
+	'0' : 'B.Tech(IT)',
+	'1' : 'B.Tech(CSE)',
+	'2' : 'B.Tech(Mechanical)',
+	'3' : 'B.Tech(ECE)',
+	'4' : 'B.Tech(IN)',
+	'5' : 'B.Sc(Chemistry)',
+	'6' : 'B.Sc(Physics)',
+	'7' : 'B.Sc(Microbiology)',
+	'8' : 'M.Sc(Chemistry)',
+	'9' : 'M.Sc(Physics)',
+	'10' : 'M.Sc(Microbiology)',
+	'11' : 'B.J.M.C.'
+	
+	}
+
+	if 'User_ID' in session:
+
+		first_name = request.form.get('FirstName')
+		last_name = request.form.get('LastName')
+		department_id = request.form.get('department_id')
+		department_name = department[department_id]
+		password = request.form.get('newpassword')
+		confirm_password = request.form.get('cnewpassword')
+
+		email_or_phone = request.form.get('email_Or_Phone')
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		if password == confirm_password:
+			db.execute("UPDATE registrations SET first_name=:first_name, last_name=:last_name, department=:department_name, password=:password  WHERE phone=:email_or_phone OR email=:email_or_phone",
+			{"first_name":first_name, "last_name":last_name, "department_name":department_name, "password":password, "email_or_phone":email_or_phone})
+			db.commit()
+			db.close()
+
+			alert_type = 'success'
+			flash (f"Your Information Has been successfully Updated { first_name }!")
+
+			return render_template('updatepassword.html',  alert_type = alert_type, department = department)	
+
+
+		elif password != confirm_password:
+
+			alert_type = 'warning'
+			flash (f"Please Confirm Your Password Properly!")
+
+			return render_template('updatepassword.html',  alert_type = alert_type, department = department)		
+
+		else:
+			alert_type = 'error'
+			flash (f"OOps, Something went wrong!")
+
+			return render_template('updatepassword.html',  alert_type = alert_type, department = department)		
+
+	else:
+		return redirect(url_for('index'))		
 
 
 @app.route("/addcategory",methods=["POST", "GET"])
@@ -896,30 +1085,6 @@ def addcategory():
 
 	else:
 		return redirect(url_for('index'))	
-
-# @app.route("/generatecode",methods=["post"])
-# def generatecode():
-#   # Declare a digits variable 
-#   # which stores all digits 
-#   digits = "0123456789"
-#   Unique_code = "" 
-
-#   # length of unique code can be chaged 
-#   # by changing value in range 
-#   for i in range(4): 
-#       Unique_code += digits[math.floor(random.random() * 10)] 
-		
-
-	# print('start-start')
-	# print(Unique_code)
-	# print('end-wdnjkdfjd')    
-
-
-#   return render_template('addcategory.html', Unique_code = Unique_code) 
-
-#     # newcat = request.form.get('Newcat')
-#     # cattype = request.form.get('Cattype')
-
 
 
 @app.route("/addnewcategory",methods=["POST"])
@@ -939,54 +1104,221 @@ def addnewcategory():
 		for r in result:
 			category_code = r.category_code
 
-			if (result):
-				alert_type = 'warning'
-				flash (f"Sorry, Item { category_name } already exists with Category code { category_code }")
+		if (result):
+			alert_type = 'warning'
+			flash (f"Sorry, Item { category_name } already exists with Category code { category_code }")
 
-				# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
-				low_items_count, critical_items_count = findItemsCount()
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
 
-				return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+			return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 		
-			elif(result == []):
-				db.execute("INSERT INTO category(category_name, category_type, lowlevel_qty, critical_level_qty, category_code) VALUES(:category_name, :category_type, :lowlevel_qty, :critical_level_qty, :category_code)",
-				{"category_name":category_name,"category_type":category_type,"lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty,"category_code":category_code})
-				db.commit()
-				db.close()
-				alert_type = 'success'
-				flash( f"New category { category_name } has been successfully added!")
+		elif(result == []):
+			db.execute("INSERT INTO category(category_name, category_type, lowlevel_qty, critical_level_qty, category_code) VALUES(:category_name, :category_type, :lowlevel_qty, :critical_level_qty, :category_code)",
+			{"category_name":category_name,"category_type":category_type,"lowlevel_qty":lowlevel_qty,"critical_level_qty":critical_level_qty,"category_code":category_code})
+			db.commit()
+			db.close()
+			alert_type = 'success'
+			flash( f"New category { category_name } has been successfully added!")
 
-				# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
-				low_items_count, critical_items_count = findItemsCount()
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
 
-				return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+			return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
-		alert_type = 'error'
-		flash (f"Oops, Something went wrong!")
+		else:
+			alert_type = 'error'
+			flash (f"Oops, Something went wrong!")
 
-		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
-		low_items_count, critical_items_count = findItemsCount()
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
 
-		return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+			return render_template('addcategory.html', alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
 
 	else:
 		return redirect(url_for('index'))	
 
-@app.route("/admin")
-def admin():
-	return render_template('admin.html')
 
-@app.route("/faculty")
-def faculty():
-	return render_template('faculty.html')
+# @app.route("/updatecategory",methods=["GET"])
+# def updatecategory():
 
-@app.route("/head")
-def head():
-	return render_template('head.html')        
+# 	if 'SuperUser_ID' in session:
 
-@app.route("/test")
-def test():
-	return render_template('test.html')
+# 		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+# 		low_items_count, critical_items_count = findItemsCount()
+
+# 		return render_template('allcategories.html', low_items_count = low_items_count, critical_items_count = critical_items_count) 
+
+# 	else:
+# 		return redirect(url_for('index'))		
+
+
+@app.route("/updateproductcategoryinfo/<product_code>", methods=["POST", "GET"])
+def updateproductcategoryinfo(product_code):
+
+	if 'SuperUser_ID' in session:
+
+		category_code = product_code
+
+		update_this_product_category = db.execute("SELECT * FROM category WHERE category_code=:category_code ",
+		{'category_code':category_code}).fetchall()
+
+		for r in update_this_product_category:
+
+			category_name = r.category_name
+			category_type = r.category_type
+			lowlevel_qty = r.lowlevel_qty
+			critical_level_qty = r.critical_level_qty
+
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		return render_template('updatecategory.html', low_items_count = low_items_count, critical_items_count = 
+		critical_items_count, category_name = category_name, category_type = category_type, lowlevel_qty = 
+		lowlevel_qty, critical_level_qty = critical_level_qty, category_code = category_code)
+
+
+	else:
+		return redirect(url_for('index'))	
+
+
+@app.route("/updatecategoryinfo", methods=["POST"])
+def updatecategoryinfo():
+
+	if 'SuperUser_ID' in session:		
+
+		category_name = request.form.get('Newcat')
+		category_type = request.form.get('Cattype')
+		lowlevel_qty = request.form.get('Lowlevel')
+		critical_level_qty = request.form.get('Crilevel')
+		category_code = request.form.get('Catcode')
+
+		# UPDATING OF CATEGORY INFORMATION WILL TAKE PLACE IN 3 STEPS
+
+		# STEP-1 UPDATING THE INFORMATION IN THE "category" TABLE
+
+		db.execute("UPDATE category SET category_name=:category_name, category_type=:category_type, lowlevel_qty=:lowlevel_qty, critical_level_qty=:critical_level_qty WHERE category_code=:category_code",
+		{"category_name":category_name, "category_type":category_type, "lowlevel_qty":lowlevel_qty, "critical_level_qty":critical_level_qty, "category_code":category_code})
+		db.commit()
+		db.close()	
+
+		# RE-ASSIGNING VARIABLES ACCORDING TO THE VARIABLE NAMES IN THE "products" AND "requests" TABLE
+
+		product_name = category_name
+		product_type = category_type
+		product_code = category_code
+
+		# STEP-2 UPDATING THE INFORMATION IN THE "products" TABLE
+
+		db.execute("UPDATE products SET product_name=:product_name, product_type=:product_type, lowlevel_qty=:lowlevel_qty, critical_level_qty=:critical_level_qty WHERE product_code=:product_code",
+		{"product_name":product_name, "product_type":product_type, "lowlevel_qty":lowlevel_qty, "critical_level_qty":critical_level_qty, "product_code":product_code})
+		db.commit()
+		db.close()
+
+		# STEP-3 UPDATING THE INFORMATION IN THE "requests" TABLE
+
+		db.execute("UPDATE requests SET product_name=:product_name, product_type=:product_type, lowlevel_qty=:lowlevel_qty, critical_level_qty=:critical_level_qty WHERE product_code=:product_code",
+		{"product_name":product_name, "product_type":product_type, "lowlevel_qty":lowlevel_qty, "critical_level_qty":critical_level_qty, "product_code":product_code})
+		db.commit()
+		db.close()
+
+		alert_type = 'success'
+		flash (f"The Product information has been Successfully Updated!")
+
+		# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+		low_items_count, critical_items_count = findItemsCount()
+
+		all_categories = db.execute("SELECT * FROM category").fetchall()
+
+		return render_template('allcategories.html', all_categories = all_categories, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+	else:
+		return redirect(url_for('index'))
+
+
+@app.route("/deleteproductcategory", methods=["POST", "GET"])
+def deleteproductcategory():
+
+	if 'SuperUser_ID' in session:
+
+		if request.method == 'POST':
+
+			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
+			low_items_count, critical_items_count = findItemsCount()
+
+			category_code = request.form.get('product_code')
+			product_code = category_code
+
+			pending_requests = db.execute("SELECT * FROM requests WHERE product_code=:product_code AND request_status = 'Pending' ",
+			{"product_code":product_code}).fetchall() 
+
+			# COUNTING THE NUMBER OF PENDING REQUESTS FOR THE CATEGORY ITEM SELECTED FOR DELETION
+			i = 0
+			count = 0
+			for item in pending_requests:
+				i += 1
+
+			pending_requests_count = i
+
+			# IF THERE ARE ANY PENDING REQUESTS THEN THEY NEED TO BE HANDLED FIRST
+
+			if (pending_requests):   # MEANS IF THERE ARE ANY PENDING REQUESTS
+
+				alert_type = 'info'
+				flash (f"There are { pending_requests_count } pending request(s) for this item. The item can be Deleted only after handling those Requests!")
+
+				all_categories = db.execute("SELECT * FROM category").fetchall()
+				return render_template('allcategories.html', all_categories = all_categories, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+			else:  # MEANS THERE ARE NO PENDING REQUESTS FOR THE SELECTED CATEGORY ITEM SO ITEM CAN BE DELETED	
+
+				# DELETION OF CATEGORY ITEM WILL TAKE PLACE IN 2 STEPS
+
+				# STEP-1 DELETING THE iTEM FROM THE "category" TABLE
+
+				db.execute("DELETE from category WHERE category_code=:category_code",
+				{"category_code":category_code})
+				db.commit()
+				db.close()
+
+				# STEP-2 DELETING THE ITEM FROM THE "products" TABLE
+
+				db.execute("DELETE from products WHERE product_code=:product_code",
+				{"product_code":product_code})
+				db.commit()
+				db.close()
+
+				alert_type = 'success'
+				flash (f"The Product category has been successfully Deleted!")
+
+				all_categories = db.execute("SELECT * FROM category").fetchall()
+				return render_template('allcategories.html', all_categories = all_categories, alert_type = alert_type, low_items_count = low_items_count, critical_items_count = critical_items_count)
+
+
+		else:
+			return redirect(url_for('allcategories'))
+
+	else:
+		return redirect(url_for('index'))		
+
+
+# @app.route("/admin")
+# def admin():
+# 	return render_template('admin.html')
+
+# @app.route("/faculty")
+# def faculty():
+# 	return render_template('faculty.html')
+
+# @app.route("/head")
+# def head():
+# 	return render_template('head.html')        
+
+# @app.route("/test")
+# def test():
+# 	return render_template('test.html')
 
 
 @app.route("/allproductsstoremanager",methods=["POST", "GET"])
@@ -1089,7 +1421,10 @@ def userissueditems():
 
 		full_name = str(first_name)	+ " " + str(last_name)	
 
-		issued_items = db.execute("SELECT * FROM requests WHERE product_issued_on != 'Not-issued' AND requested_by=:full_name",
+		# issued_items = db.execute("SELECT * FROM requests WHERE product_issued_on != 'Not-issued' AND requested_by=:full_name",
+		# {"full_name":full_name}).fetchall()
+
+		issued_items = db.execute("SELECT * FROM requests WHERE request_status = 'Approved' AND requested_by=:full_name",
 		{"full_name":full_name}).fetchall()
 
 		print('NOW THE REQUESTED TEMPLATE WILL BE RENDERED')
@@ -1115,15 +1450,9 @@ def userreturneditems():
 		if request.method == 'POST':
 			person_phone_or_email = request.form.get('email_Or_Phone')
 
-			print('!!!!!!GETTING USER ID FROM NAV BAR SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
 		else:	
 			person_phone_or_email = session['User_ID']
 
-			print('!!!!!!GETTING USER ID IN BOTH CASES SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
 
 		result = db.execute("SELECT * from registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
 		{"person_phone_or_email":person_phone_or_email}).fetchall()
@@ -1150,15 +1479,46 @@ def userrequesteditems():
 		if request.method == 'POST':
 			person_phone_or_email = request.form.get('email_Or_Phone')
 
-			print('!!!!!!GETTING USER ID FROM NAV BAR SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
 		else:	
 			person_phone_or_email = session['User_ID']
 
-			print('!!!!!!GETTING USER ID IN BOTH CASES SUBMISSION!!!!!!!')
-			print('!')
-			print('!')
+
+		result = db.execute("SELECT * from registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
+		{"person_phone_or_email":person_phone_or_email}).fetchall()
+
+		for r in result:
+			first_name = r.first_name
+			last_name = r.last_name
+			registration_status = r.reg_status
+			phone = r.phone
+			email = r.email
+			password = r.password
+			department = r.department
+			registered_as = r.designation	
+			
+		full_name = str(first_name)	+ " " + str(last_name)
+
+		requested_items = db.execute("SELECT * from requests WHERE requested_by=:full_name AND request_status = 'Pending' ",
+		{"full_name":full_name}).fetchall()
+
+		return render_template('userrequesteditems.html', requested_items = requested_items, first_name = first_name, 
+		last_name = last_name, department = department, registered_as = registered_as)
+
+	else:
+		return redirect(url_for('index'))	
+
+
+@app.route("/userapprovedrequests",methods=["POST", "GET"])
+def userapprovedrequests():
+
+	if 'User_ID' in session:
+
+		if request.method == 'POST':
+			person_phone_or_email = request.form.get('email_Or_Phone')
+
+		else:	
+			person_phone_or_email = session['User_ID']
+			
 
 		result = db.execute("SELECT * from registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
 		{"person_phone_or_email":person_phone_or_email}).fetchall()
@@ -1171,13 +1531,45 @@ def userrequesteditems():
 			
 		full_name = str(first_name)	+ " " + str(last_name)
 
-		requested_items = db.execute("SELECT * from requests WHERE requested_by=:full_name",
+		user_approved_requests = db.execute("SELECT * from requests WHERE requested_by=:full_name AND request_status = 'Approved' ",
 		{"full_name":full_name}).fetchall()
 
-		return render_template('userrequesteditems.html', requested_items = requested_items)
+		return render_template('userapprovedrequests.html', user_approved_requests = user_approved_requests)
 
 	else:
 		return redirect(url_for('index'))	
+
+
+@app.route("/userrejectedrequests",methods=["POST", "GET"])
+def userrejectedrequests():
+
+	if 'User_ID' in session:
+
+		if request.method == 'POST':
+			person_phone_or_email = request.form.get('email_Or_Phone')
+
+		else:	
+			person_phone_or_email = session['User_ID']
+			
+
+		result = db.execute("SELECT * from registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
+		{"person_phone_or_email":person_phone_or_email}).fetchall()
+
+		for r in result:
+			first_name = r.first_name
+			last_name = r.last_name
+
+		print(result)	
+			
+		full_name = str(first_name)	+ " " + str(last_name)
+
+		user_rejected_requests = db.execute("SELECT * from requests WHERE requested_by=:full_name AND request_status = 'Not-Approved' ",
+		{"full_name":full_name}).fetchall()
+
+		return render_template('userrejectedrequests.html', user_rejected_requests = user_rejected_requests)
+
+	else:
+		return redirect(url_for('index'))			
 
 # @app.route("/addrequest",methods=["GET", "POST"])
 # def addrequest():
@@ -1308,7 +1700,7 @@ def addrequest():
 			max_issuable_qty  = r.max_issuable_qty
 
 			
-		product_request_exists = db.execute("SELECT * FROM requests WHERE product_code=:product_code AND requested_by=:requested_by",
+		product_request_exists = db.execute("SELECT * FROM requests WHERE product_code=:product_code AND requested_by=:requested_by AND request_status = 'Pending' ",
 		{'product_code':product_code, "requested_by":requested_by}).fetchall()
 
 		print('start-start-start')
@@ -1481,6 +1873,37 @@ def deleterequest():
 
 	else:
 		return redirect(url_for('index'))	
+
+# THIS BELOW PATH PERFORMS THE SAME FUNCTION AS "/deleterequest". HOWEVER THIS OATH IS RENDERED FROM "userrequesteditems"
+# PAGE WHICH BASICALLY IS SHOWS REQUESTS MADE BY USER THAT HAVE OT YET BEEN TAKEN ACTION ON
+
+@app.route("/deletependingrequest",methods=["GET", "POST"])
+def deletependingrequest():
+
+	if 'User_ID' in session:
+
+		# now = datetime.now()
+		# leaving_time = now.strftime("%H:%M:%S")
+
+		first_name = request.form.get('first_name')
+		last_name = request.form.get('last_name')
+
+		requested_by = str(first_name) + " " + str(last_name)
+
+		department = request.form.get('department')
+		designation = request.form.get('registered_as')
+
+		product_code = request.form.get('product_code')
+		
+		db.execute("DELETE from requests WHERE product_code=:product_code AND requested_by=:requested_by",
+		{"product_code":product_code, "requested_by":requested_by})
+		db.commit()
+		db.close()
+
+		return redirect(url_for('userrequesteditems')) # THIS URL REDIRECTS TO PENDING REQUESTS MADE BY USER
+
+	else:
+		return redirect(url_for('index'))		
 
 
 
@@ -2251,15 +2674,40 @@ def superuserlogin():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
+
+
+	elif 'User_ID' in session: # A GENERAL USER TRYING TO ACCESS THIS LINK WILL BE REDIRECTED TO "allproductsuser.html" 									  
+	
+		person_phone_or_email = session['User_ID']
+
+		result = db.execute("SELECT * FROM registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
+		{"person_phone_or_email":person_phone_or_email}).fetchall()
+		for r in result:
+			registration_status = r.reg_status
+			phone = r.phone
+			email = r.email
+			password = r.password
+			first_name = r.first_name
+			last_name = r.last_name
+			department = r.department
+			registered_as = r.designation
+
+		alert_type = "info"
+		flash (f" Hey { first_name }, you are already logged in as { registered_as }!")	
+
+		all_products = db.execute("SELECT * FROM products").fetchall()
+		return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, first_name = first_name, 
+		last_name = last_name, department = department, registered_as = registered_as)		
+
 
 	else:  # MEANS SUPERUSER IS NOT LOGGED IN
 		return render_template('superuserlogin.html')	
@@ -2268,7 +2716,31 @@ def superuserlogin():
 @app.route("/newsuperuserlogin", methods=['POST', 'GET'])
 def newsuperuserlogin():
 
-	if not 'SuperUser_ID' in session:  # MEANS SUPERUSER IS NOT LOGGED IN
+
+	if 'User_ID' in session: # A GENERAL USER TRYING TO ACCESS THIS LINK WILL BE REDIRECTED TO "allproductsuser.html" 									  
+	
+		person_phone_or_email = session['User_ID']
+
+		result = db.execute("SELECT * FROM registrations WHERE phone=:person_phone_or_email OR email=:person_phone_or_email",
+		{"person_phone_or_email":person_phone_or_email}).fetchall()
+		for r in result:
+			registration_status = r.reg_status
+			phone = r.phone
+			email = r.email
+			password = r.password
+			first_name = r.first_name
+			last_name = r.last_name
+			department = r.department
+			registered_as = r.designation
+
+		alert_type = "info"
+		flash (f" Hey { first_name }, you are already logged in as { registered_as }!")	
+
+		all_products = db.execute("SELECT * FROM products").fetchall()
+		return render_template('allproductsuser.html', all_products = all_products, alert_type = alert_type, first_name = first_name, 
+		last_name = last_name, department = department, registered_as = registered_as)
+
+	elif not 'SuperUser_ID' in session:  # MEANS SUPERUSER IS NOT LOGGED IN
 
 		if request.method == 'POST':
 
@@ -2326,15 +2798,15 @@ def newsuperuserlogin():
 
 				elif designation == 'Admin':
 
-					all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+					pending_registrations = db.execute("SELECT * FROM registrations WHERE reg_status = 'Pending' ").fetchall()
 
 					# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 					# low_items_count, critical_items_count = findItemsCount()
 
-					# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+					# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 					# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-					return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+					return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 
 			else:
 				alert_type = 'error'
@@ -2382,15 +2854,15 @@ def newsuperuserlogin():
 
 		elif designation == 'Admin':
 
-			all_registrations = db.execute("SELECT * FROM registrations").fetchall()
+			pending_registrations = db.execute("SELECT * FROM registrations WHERE WHERE reg_status = 'Pending' ").fetchall()
 
 			# FUNCTION CALL TO FIND NUMBER OF LOW AND CRITICAL ITEMS IN THE STORE
 			# low_items_count, critical_items_count = findItemsCount()
 
-			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE allregistrations PAGE 
+			# ADMIN WILL NOT SEE THE LIST OF PRODUCTS , IT WILL LAND ON THE pendingregistrations PAGE 
 			# WHERE HE WILL BE ABLE TO APPROVE OR REJECT REGISTRATIONS
 
-			return render_template('allregistrations.html', all_registrations = all_registrations, alert_type = alert_type)
+			return render_template('pendingregistrations.html', pending_registrations = pending_registrations, alert_type = alert_type)
 	
 				
 

@@ -17,7 +17,7 @@
 
     <!-- Bootstrap Links Ends  -->
 
-    <title>All Registrations</title>
+    <title>Approved Registrations</title>
 
     <script>
         function myFunction() {
@@ -59,7 +59,9 @@
 
     <div class="topnav" id="myTopnav">
    
-        <a class="active" href="/allregistrations"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a class="active" href="/pendingregistrations"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="/approvedregistrations">Approved Regs.</a>
+        <a href="/rejectedregistrations">Rejected Regs.</a>
         <a href="/allfacultymembers">Update Head</a>
         <a href="/allclerks">Update Store Manager</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
@@ -127,7 +129,7 @@
     {% endwith %}
 
     <center>
-        <h1>These are the records of all the Registrations</h1>
+        <h1>These are the records of all the approved Registrations</h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
@@ -138,16 +140,14 @@
                     <th>Designation</th>
                     <th>Email</th>
                     <th>Phone No.</th>
-                    <th>Password</th>
                     <th>Registered On</th>
                     <th>Reg. Status</th>
-                    <th>Reason</th>
                     <th>Date</th>
-                    <th style="text-align: right;">Accept or Reject Registrations</th>
+                    <th style="text-align: right;">Reject Registrations</th>
                     
                 </tr>
-                {% if all_registrations %}
-                {% for item in all_registrations %}
+                {% if approved_registrations %}
+                {% for item in approved_registrations %}
                 <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.first_name }}</td>
@@ -156,12 +156,10 @@
                     <td>{{ item.designation }}</td>
                     <td>{{ item.email }}</td>
                     <td>{{ item.phone }}</td>
-                    <td>{{ item.password }}</td>
                     <td>{{ item.registered_on }}</td>
                     <td>{{ item.reg_status }}</td>
-                    <td>{{ item.reason }}</td>
                     <td>{{ item.confirmed_on }}</td>
-                    <td style="text-align: right;"><a href="{{ url_for('acceptregistration', person_phone_no=item.phone)}}"><button type="button" class="btn btn-secondary">APPROVE</button></a>
+                    <td style="text-align: right;"><!-- <a href="{{ url_for('acceptregistration', person_phone_no=item.phone)}}"><button type="button" class="btn btn-secondary">APPROVE</button></a> -->
                     <button type="button" class="btn btn-secondary" onclick="openForm(); sendPersonPhoneNo('{{ item.phone }}');">REJECT</button></td>
                 </tr>
                 {% endfor %}
@@ -187,7 +185,7 @@
     </center>
 
 <div class="form-popup form" id="myForm">
-  <form action="/rejectregistration" class="form-container" method="GET" style="max-width: 300px;">
+  <form action="/rejectapprovedregistration" class="form-container" method="GET" style="max-width: 300px;">
     
     <input id = "receive_person_phone_no" type="hidden" name="Person_phone_no">
 

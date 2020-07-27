@@ -35,6 +35,22 @@
         x.classList.toggle("change");
         }
     </script>
+
+    <script type="text/javascript">
+        function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+        }
+
+        function sendProductCode(product_code) {
+        document.querySelector("#receive_product_code").value =  product_code;
+        }
+    </script>    
+
+
 </head>
 
 <body>
@@ -101,6 +117,18 @@
         }
 
     </style>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        swal("{{ message }}", "",'{{alert_type}}' );
+    </script>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <center>
         <h1>These are all the different items available in the Store </h1>
         <div style="overflow-x:auto;">
@@ -112,7 +140,7 @@
                     <th>Lowlevel Qty.</th>
                     <th>Crritical Level Qty.</th>
                     <th>Category Code</th>
-                    <!-- <th style="text-align: right;">Add or Remove Items</th> -->
+                    <th style="text-align: right;">Update or Delete Category</th>
                     
                 </tr>
                 {% if all_categories %}
@@ -124,8 +152,8 @@
                     <td>{{ item.lowlevel_qty }}</td>
                     <td>{{ item.critical_level_qty }}</td>
                     <td>{{ item.category_code }}</td>
-                    <!-- <td style="text-align: right;"><button type="button" class="btn btn-secondary">ADD</button>
-                        <button type="button" class="btn btn-secondary">REMOVE</button></td> -->
+                    <td style="text-align: right;"><a href="{{ url_for('updateproductcategoryinfo', product_code=item.category_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">UPDATE</button></a>
+                    <button type="button" class="btn btn-secondary" onclick="openForm(); sendProductCode('{{item.category_code|tojson}}');">DELETE</button></td>
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -135,6 +163,30 @@
             </table>
         </div>
     </center>
+
+
+    <div class="form-popup form" id="myForm" style="border-color: #333">
+        <form action="/deleteproductcategory" class="form-container" method="POST">
+
+            <!-- <label for="quantity" style="font-size: 22px;"><b><u>Quantity</u></b></label>
+            <input id = "requested_qty" type="text" placeholder="Enter Required Quantity" name="Quantity" required> -->
+            <label for="quantity" style="font-size: 25px;"><u>Information</u></label>
+            <!-- <label>Information</label> -->
+            <label style="font-size: 20px;">Deleting product category will delete the records from both
+            <b><i><u>Products</u></i></b> Table and <b><i><u>Category</u></i></b> Table but records in <b><i><u>Requests</u></i></b> table will not be Deleted.
+            </label>
+
+            <!-- THIS PRODUCT CODE WILL BE SENT TO DELETE THE RECORDS OF SELECTED PRODUCT -->
+            <input id = "receive_product_code" name="product_code" type="hidden" readonly>
+
+            <div class = "signup-btn" style="text-align: left;">
+                <button type="submit" class="" style="font-size: 12px;">Ok</button>
+                <button type="button" class=""  style="font-size: 12px;" onclick="closeForm()">Close</button>
+            </div>
+        </form>
+    </div>
+
+
 </body>
 
 </html>

@@ -17,7 +17,7 @@
 
     <!-- Bootstrap Links Ends  -->
 
-    <title>Requested Items</title>
+    <title>Approved Requests</title>
 
     <script>
         function myFunction() {
@@ -54,19 +54,6 @@
         function redirectHome(){
             document.getElementById("homeredirectform").submit();
         }
-    </script>
-
-    <script type="text/javascript">
-
-        function setProductCode(product_code, callback) {
-            document.querySelector("#receive_product_code").value =  product_code;
-            callback();
-        }
-
-        function submitDeleteRequestForm(){
-            document.getElementById("delete_product_request_form").submit();
-        }
-
     </script>
 
 </head>
@@ -131,7 +118,7 @@
 
     </style>
     <center>
-        <h1>These are the records of all the pending Requests</h1>
+        <h1>These are the records of all the approved Requests</h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
@@ -142,11 +129,12 @@
                     <th>Requested Qty.</th>
                     <th>Request Date</th>
                     <th>Request Status</th>
-                    <th style="text-align: right;">Remove Requests</th>
-                    
+                    <th>Reason</th>
+                    <!-- <th>Product Issued On</th>
+                    <th>Returned On</th> -->
                 </tr>
-                {% if requested_items %}
-                {% for item in requested_items %}
+                {% if user_approved_requests %}
+                {% for item in user_approved_requests %}
                 <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.product_name }}</td>
@@ -155,8 +143,9 @@
                     <td>{{ item.requested_qty }}</td>
                     <td>{{ item.request_date }}</td>
                     <td>{{ item.request_status }}</td>
-                    <td style="text-align: right;"><button type="button" class="btn btn-secondary" onclick="setProductCode('{{item.product_code|tojson}}', 
-                    submitDeleteRequestForm );">REMOVE</button></td>
+                    <td>{{ item.reason }}</td>
+                    <!-- <td>{{ item.product_issued_on }}</td>
+                    <td>{{ item.returned_on }}</td> -->
                 </tr>
                 {% endfor %}
                 {% else %}
@@ -166,19 +155,6 @@
             </table>
         </div>
     </center>
-
-
-    <!-- THIS FORM SENDS THE DATA TO BE USED FOR DELETING THE REQUEST MADE BY USER AND THEN RENDERS THIS PAGE INSTEAD OF HOME PAGE -->
-    <form action="/deletependingrequest" id="delete_product_request_form" method="POST">
-        <!-- INPUT FIELDS CONTAINING USER CREDENTIALS -->
-        <input type = "hidden" name="first_name"  value="{{ first_name }}">
-        <input type = "hidden" name="last_name"  value="{{ last_name }}">
-        <input type = "hidden" name="department"  value="{{ department }}">
-        <input type = "hidden" name="registered_as"  value="{{ registered_as }}">
-        <!-- INPUT FIELD ENDS -->
-
-        <input id = "receive_product_code" type="hidden" name="product_code">
-    </form>
 
     <!-- THIS FORM SENDS USER EMAIL OR NUMBER USED TO FETCH THE ITEMS ISSUED TO USER, OR REQUESTED BY USER, OR RETURNED BY USER--IMPORTANT FORM -->
     <form id="requesteditems" method="POST" style="display: none;">       

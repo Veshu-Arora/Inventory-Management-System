@@ -7,7 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
 	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<title>Add Category</title>
+	<title>Update Category</title>
 
 	<script>
 		function myFunction() {
@@ -26,6 +26,18 @@
 		}
 	</script>
 
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", defaultCheckRadioButton);
+		function defaultCheckRadioButton() {
+			if ("{{ category_type }}" == "Consumable"){
+				document.getElementById("Consumable").checked = true;
+			}
+			else {
+				document.getElementById("Nonconsumable").checked = true;
+			}
+		}
+	</script>
+
 	<style type="text/css">
 		.topnav a:hover{
 			text-decoration: underline;
@@ -41,7 +53,6 @@
 		<a href="/allcategories">All Categories</a>
 		<a href="/addproduct">Add Product</a>
 		<a href="/issueditems">Issued Items</a>
-		<!-- <a href="/allproductsstoremanager">All Items</a> --> <!-- TO BE REPLACED BY HOME -->
 		<a href="/criticalitems">Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p></a>
 		<a href="/lowitems">Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
 		<a href="/allrequests">All Requests</a>
@@ -67,7 +78,7 @@
         	<span>
             Inventory Management
             System <br>
-            Add Product<br>
+            Update Product<br>
             Category
             </span>
         </div>
@@ -84,11 +95,11 @@
 		{% endwith %}
         
         <div class="form">
-			<h1>Add New Category</h1>
+			<h1>Update Category</h1>
             
-            <form action="/addnewcategory" method="POST">
+            <form action="/updatecategoryinfo" method="POST">
 				<div>
-					<input type="text" name="Newcat" placeholder="Category Name" required><br>
+					<input type="text" name="Newcat" placeholder="Category Name"  value="{{ category_name }}" required><br>
 				</div>
 				<div class="cat-box">
 					<p>Category Type:</p>
@@ -100,41 +111,40 @@
 					</div>
 				</div>
 				<div>
-					<input type="digit" name="Lowlevel" placeholder="Set Low Level Quantity" required><br>
+					<input type="digit" name="Lowlevel" placeholder="Set Low Level Quantity"  value =
+					"{{ lowlevel_qty }}" required><br>
 				</div>
 
 				<div>
-					<input type="digit" name="Crilevel" placeholder="Set Critical Level Quantity" required><br>
+					<input type="digit" name="Crilevel" placeholder="Set Critical Level Quantity"  value =
+					"{{ critical_level_qty }}" required><br>
 				</div>
 
-				<div class="generate-code-btn">
-            		<!-- <div>
-						<input type="text" name="FirstName" placeholder="First Name" required><br>
-					</div> -->
-					<div>
+				<!-- <div class="generate-code-btn"> -->
+					<!-- <div>
 						<button type="submit" id = "generate-code-btn" name="Generate Code" >Generate Code</button>
-					</div>
-					<div>
-						<input type="digit" id = "Unique_code" name="Catcode" placeholder="New Category Code" required><br>
-					</div>
+					</div> -->
+				<div>
+					<input type="digit" id = "Unique_code" name="Catcode" placeholder="New Category Code" value =
+					"{{ category_code }}" required readonly><br>
 				</div>
+				<!-- </div> -->
 				<!-- <div>
 					<button type="button" name="Generate Code">Generate Code</button>
 					<input type="digit" name="catcode" placeholder="New Category Code" required><br>
 				</div> -->
 				<div class="add-btn">
-					<button>Add</button>
+					<button>Update</button>
 				</div>
-				<!-- <div class="pre-account">
-					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
-				</div> --> 
             </form>
         </div>
     </div>
 
     <!-- THIS IS A VERY IMPORTANT FUNCTION WHICH GENERATES THE UNIQUE CODE AT THE TIME OF ADDING A NEW PRODUCT CATEGORY ! DO NOT MODIFY ! -->
 
-    <script>
+    <!-- THERE IS NO NEED FOR THIS FUNCTION IN THE UPDATION PART -->
+
+    <!-- <script>
 
 		document.querySelector("#generate-code-btn").addEventListener('click', (event) => {
 		event.preventDefault();
@@ -145,7 +155,7 @@
 		  var fourdigitsrandom = Math.floor(1000 + Math.random() * 9000);
 		  document.getElementById("Unique_code").value=fourdigitsrandom;
 		 } 
-	</script>
+	</script> -->
 
 </body>
 </html>

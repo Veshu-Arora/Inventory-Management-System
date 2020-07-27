@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -18,7 +17,7 @@
 
     <!-- Bootstrap Links Ends  -->
 
-    <title>All Products</title>
+    <title>Rejected Registrations</title>
 
     <script>
         function myFunction() {
@@ -47,27 +46,26 @@
         document.getElementById("myForm").style.display = "none";
         }
 
-        function sendProductCodeToSetMaxIssuableQty(product_code) {
-        document.querySelector("#receive_product_code_to_set_issuable_qty").value =  product_code;
+        function sendPersonPhoneNo(person_phone_no) {
+        document.querySelector("#receive_person_phone_no").value =  person_phone_no;
         }
-
+          
     </script>
     <!-- jAVASCRIPT FOR FORM ENDS -->
-    
+
 </head>
 
 <body>
 
-    <div class="topnav" id="myTopnav">   
-        <a class="active" href="/allproductshead"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href = '/allrequestshead'>Requested Items</a>
-        <a href = '/issueditemshead'>Issued Items</a>
-        <a href = '/criticalitemshead'>Critical Items<p id = 'show_critical_count'>( {{ critical_items_count }} )</p>
-        </a>
-        <a href = '/lowitemshead'>Low Items<p id = 'show_low_count'>( {{ low_items_count }} )</p></a>
-        <a href = '/returneditemshead'>Returned Items</a>
+    <div class="topnav" id="myTopnav">
+   
+        <a class="active" href="/pendingregistrations"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="/approvedregistrations">Approved Regs.</a>
+        <a href="/rejectedregistrations">Rejected Regs.</a>
+        <a href="/allfacultymembers">Update Head</a>
+        <a href="/allclerks">Update Store Manager</a>
         <a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <!-- <i class="fa fa-bars"></i> -->
+         
 
         <div class="container" onclick="cross(this)">
             <div class="bar1"></div>
@@ -78,7 +76,8 @@
         </a>
         <div class="topnav-right">
             <a href="/logoutsuperuser">Logout</a>
-            <a href="/updatepasswordhead">Update</a>
+            <a href="/updatepasswordadmin">Update</a>
+            
         </div>
     </div>
 
@@ -130,77 +129,91 @@
     {% endwith %}
 
     <center>
-        <h1>These are all the items available in the Store </h1>
+        <h1>These are the records of all the rejected Registrations</h1>
         <div style="overflow-x:auto;">
             <table id="customers">
                 <tr>
                     <th>ID</th>
-                    <th>Product Name</th>
-                    <th>Product Code</th>
-                    <th>Quantity Available</th>
-                    <th>Product Type</th>
-                    <th>Lowlevel Qty.</th>
-                    <th>Critical Level Qty.</th>
-                    <th>Mark Status</th>
-                    <th>Max Issuable Qty.</th>
-                    <th style="text-align: right;">Mark or Unmark Items</th>
-                    <th style="text-align: right;">Set or Remove Max Issuable Qty.</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Email</th>
+                    <th>Phone No.</th>
+                    <th>Registered On</th>
+                    <th>Reg. Status</th>
+                    <th>Reason</th>
+                    <th>Date</th>
+                    <th style="text-align: right;">Approve Registrations</th>
                     
                 </tr>
-                {% if all_products %}
-                {% for item in all_products %}
+                {% if rejected_registrations %}
+                {% for item in rejected_registrations %}
                 <tr>
                     <td>{{ item.id }}</td>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.product_code }}</td>
-                    <td>{{ item.qty_available }}</td>
-                    <td>{{ item.product_type }}</td>
-                    <td>{{ item.lowlevel_qty }}</td>
-                    <td>{{ item.critical_level_qty }}</td>
-                    <td>{{ item.mark_status }}</td>
-                    <td>{{ item.max_issuable_qty }}</td>
-                    <td style="text-align: right;"><a href="{{ url_for('markitems', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">MARK</button></a>
-                    <a href="{{ url_for('unmarkitems', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">UNMARK</button></a>    
-                    </td>
-                    <td style="text-align: right;"><button id="product-add-btn" type="button" class="btn btn-secondary" onclick="openForm(); sendProductCodeToSetMaxIssuableQty('{{item.product_code|tojson}}');">SET QUANTITY</button>
-                    <a href="{{ url_for('removemaxissuableqty', product_code=item.product_code)}}"><button id="product-remove-btn" type="button" class="btn btn-secondary">REMOVE</button></a>    
-                    </td>
-                    
+                    <td>{{ item.first_name }}</td>
+                    <td>{{ item.last_name }}</td>
+                    <td>{{ item.department }}</td>
+                    <td>{{ item.designation }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.phone }}</td>
+                    <td>{{ item.registered_on }}</td>
+                    <td>{{ item.reg_status }}</td>
+                    <td>{{ item.reason }}</td>
+                    <td>{{ item.confirmed_on }}</td>
+                    <td style="text-align: right;"><a href="{{ url_for('acceptrejectedregistration', person_phone_no=item.phone)}}"><button type="button" class="btn btn-secondary">APPROVE</button></a>
+                    <!-- <button type="button" class="btn btn-secondary" onclick="openForm(); sendPersonPhoneNo('{{ item.phone }}');">REJECT</button> --></td>
                 </tr>
                 {% endfor %}
                 {% else %}
                 No results found
                 {% endif %}
 
+
             </table>
         </div>
+
+        <!-- Javascript to show the effect of deleting the table record using "REJECT" button -->
+        <!-- THIS IS CURRENTLY NOT BEING USED -->
+
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script>
+            $('#customers').on('click', '.delete-btn', function()  {
+                $(this).closest('tr').remove();
+            });
+        </script> -->
+
+        <!-- Javascript Ends -->
     </center>
 
+<div class="form-popup form" id="myForm">
+  <form action="/rejectregistration" class="form-container" method="GET" style="max-width: 300px;">
+    
+    <input id = "receive_person_phone_no" type="hidden" name="Person_phone_no">
 
-        <div class="form-popup form" id="myForm">
-          <form action="/setmaxissuableqty" class="form-container" method="POST">
-            <!-- <h1>Login</h1> -->
+    <label for="Specify Reason" style="font-size: 22px;"><b><u>Specify Reason</u></b></label>
 
-            <label for="quantity" style="font-size: 22px;"><b><u>Max. Issuable Qty</u></b></label>
-            <input id = "max_issuable_qty" type="text" placeholder="Enter Max Issuable Quantity" name="Quantity" required>
-
-            <!-- COMMENT FOR "Quantity" INPUT FIELD ENDS -->
-            <input id = "receive_product_code_to_set_issuable_qty" type="hidden" name="product_code" readonly>
-
-            <div class = "signup-btn" style="text-align: left;">
-                <button type="submit" class="" style="font-size: 13px;">Ok</button>
-                <button type="button" class=""  style="font-size: 13px;" onclick="closeForm()">Close</button>
+    <div class="cat-box" >
+        <!-- <p>Using the same css as for item category radio buttons</p> -->
+        <div class="cat-radio-btn" style="display: flex; flex-direction: column; max-width: 300px;">
+            <div class="rejection-reasons">
+                <input type="radio" id="Unknown Person" name="Reason" value="Unknown Person">
+                <label for="Unknown Person">Unknown Person</label>
             </div>
-          </form>
+            <div class="rejection-reasons">
+                <input type="radio" id="Some Reason" name="Reason" value="Some Reason">
+                <label for="Some Reason">Some Reason</label><br>
+            </div>
         </div>
+    </div>
+    
 
-        <!-- <script type="text/javascript">
-            document.addEventListener("DOMContentLoaded", mufunction);
-            function mufunction(){
-                alert('{{critical_items_count}}')
-                alert('{{low_items_count}}')
-            }
-        </script> -->
+    <div class = "signup-btn" style="text-align: left;">
+        <button type="submit" class="" style="font-size: 13px;">Ok</button>
+        <button type="button" class=""  style="font-size: 13px;" onclick="closeForm()">Close</button>
+    </div>
+  </form>
+</div>
 
 </body>
 
