@@ -69,7 +69,15 @@
 		{% endwith %}
 
         <div class="form">
-			
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
 			<h1>Enter Your Details</h1>
             
             <form action="/newregistration" method="POST">
@@ -94,7 +102,7 @@
 					<input type="text" name="Dept" placeholder="Enter your Department Name" required><br>
 				</div> -->
 				<div>
-					<input type="email" name="Email" placeholder="Enter your email Address" required><br>
+					<input type="text" name="Email" placeholder="Enter your email Address" required><br>
 				</div>
 				<div>
 					<input type="digit" name="Phone" placeholder="Enter your Phone Number" required><br>
@@ -112,7 +120,7 @@
 					<button>Signup</button>
 				</div>
 				<div class="pre-account">
-					<h4>Already have an Account? <a href="/index">Login Here</a></h4>
+					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
 				</div>
 				<div>
 				

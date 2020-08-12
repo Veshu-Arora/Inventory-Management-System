@@ -9,33 +9,6 @@
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<title>Home</title>
 
-	<!-- CSS FOR LABEL -->
-
-	<style type="text/css">
-		.label {
-			margin-top: 120px;
-			color: white;
-			padding:2px 15px 2px 15px;
-			outline: none;
-			font-family: 'Poiret One', cursive;
-		}
-
-		.other {
-			background-color: #696969;
-			color: white;
-			border-radius: 10px;
-		}
-
-		.form h1 {
-			margin-bottom: 20px;
-		}
-
-	</style>
-
-	<!-- CSS FOR LABEL ENDS -->
-
-
-
 	<script>
 		function myFunction() {
 		  var x = document.getElementById("myTopnav");
@@ -59,12 +32,12 @@
     	<!-- <a><i class="fas fa-home"></i><a -->
     	<!-- <a href="C:/Users\Vikrant Kumar Arora/Desktop/MAIN PROJECT/static/home.svg"></a> -->	
     	<a class="active" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
-		<a href="#" >Add Category</a>
-		<a href="#">Issued Items</a>
 		<a href="#">All Items</a>
-		<a href="/criticalitems">Critical Items</a>
-		<a href="/lowitems">Low Items</a>
-		<a href="#">Requests</a>
+		<a href="#">Request Items</a>
+		<a href="#">Issued Items</a>
+		<a href="#">Requested Items</a>
+		<a href="#">Returned Items</a>
+		<!-- <a href="#">Requests</a> -->
 		<a id = 'bar' href="javascript:void(0);" class="icon" onclick="myFunction()">
 			<!-- <i class="fa fa-bars"></i> -->
 
@@ -84,31 +57,13 @@
 
     <div class="wrapper">
         <div class="title">
-        	<!-- <span>
+        	<span>
             Inventory Management
             System <br>
             Faculty<br>
-            Signup
-            </span> -->
-            <p>
-            Add Products
-            To <br>
-            Database<br>
-            </p>
-
+            Dashboard
+            </span>
         </div>
-
-        {% with messages = get_flashed_messages() %}
-		{% if messages %}
-		{% for message in messages %}
-		<script>
-			swal("{{ message }}", "",'{{alert_type}}' );
-		</script>
-
-		{% endfor %}
-		{% endif %}
-		{% endwith %}
-        
         <div class="form">
 			<!-- {% with messages = get_flashed_messages() %}
 				{% if messages %}
@@ -119,26 +74,21 @@
 					{% endfor %}
 				{% endif %}
 			{% endwith %} -->
-			<h1>Enter Product Details</h1>
+			<h1>Add Items</h1>
             
-            <form action="/addnewproduct" method="POST">
-
-				<div class="product-options">
-
-					<span class="label other">Select Product Category</span>
-
-					<select name="product_items_id" id="" required>
-						{% for key, value in category_items.items() %}
-							<option value="{{key}}">{{value}}</option><br>
-						{% endfor %}	
-					</select>
-
+            <form action="/savedata" method="POST">
+            	<div class="name">
+            		<div>
+						<input type="text" name="FirstName" placeholder="First Name" required><br>
+					</div>
+					<div>
+						<input type="text" name="LastName" placeholder="Last Name" required><br>
+					</div>
 				</div>
-
 				<div>
-					<input type="text" name="Quantity" placeholder="Enter the product Quantity" ><br>
+					<input type="text" name="Dept" placeholder="Enter your Department Name" required><br>
 				</div>
-				<!-- <div>
+				<div>
 					<input type="text" name="Email" placeholder="Enter your email Address" required><br>
 				</div>
 				<div>
@@ -149,19 +99,13 @@
 				</div>
 				<div>
 					<input type="password" name="cpassword" placeholder="Confirm password" required><br>
-				</div> -->
-				<div class="signup-btn">
-					<button>Add product</button>
-					<button formaction = "/records" >Add New Category</button>
-					<button formaction="/storemanager">Submit to another page</button>
 				</div>
-
-				<!-- <div class="signup-btn">
-					<button type = "submit" formaction = "/storemanager" >Add New Category</button>
-				</div> -->
+				<div class="signup-btn">
+					<button>Add</button>
+				</div>
 				<!-- <div class="pre-account">
 					<h4>Already have an Account? <a href="/login">Login Here</a></h4>
-				</div> -->
+				</div> --> 
             </form>
         </div>
     </div>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'register.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<title>Home</title>
+
+	<!-- <script>
+		function myFunction() {
+		  var x = document.getElementById("myTopnav");
+		  if (x.className === "topnav") {
+			x.className += " responsive";
+		  } else {
+			x.className = "topnav";
+		  }
+		}
+		</script> -->
+</head>
+
+<body>
+    <!-- <div class="topnav" id="myTopnav">
+		<a href="/enter" >Enter Student Record</a>
+		<a href="/payfees">Pay Mess Fee</a>
+		<a href="/paydue">Pay Due</a>
+		<a href="/transaction">Transactions</a>
+		<a href="/students">Student Records</a>
+		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+			<i class="fa fa-bars"></i>
+		</a>
+	</div> -->
+
+    <div class="wrapper">
+        <div class="title">
+        	<span>
+            Inventory Management
+            System <br>
+            Password<br>
+            Update
+            </span>
+        </div>
+        <div class="form">
+			<!-- {% with messages = get_flashed_messages() %}
+				{% if messages %}
+					{% for message in messages %}
+					<script>
+						swal("{{ message }}", "Thank you!", "success");
+					</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %} -->
+			<h1>Update</h1>
+            
+            <form action="/updatepassword" method="POST">
+            	
+				<div>
+					<input type="text" name="EPhone" placeholder="Enter Email or Phone Number" required><br>
+				</div>
+				
+				<div>
+					<input type="password" name="password" placeholder="Enter your New password" required><br>
+				</div>
+
+				<div class="updatepass-btn">
+					<button>Update Password</button>
+				</div>
+				
+
+				<div class="new-account">
+					<span>Don't have an Account yet? <a href="/signup">Signup Here</a></span>
+				</div>
+
+				<div class="pre-account">
+					<span>Already have an Account? <a href="/login">Login Here</a></span>
+				</div>
+
+            </form>
+        </div>
+    </div>
+</body>
+</html>
