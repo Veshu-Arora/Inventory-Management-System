@@ -21,32 +21,24 @@
 		</script> -->
 
 		<script type="text/javascript">
-			document.addEventListener("DOMContentLoaded", getDesignation);
-			function getDesignation(){
-				var designation = localStorage.getItem("designation")
-				document.querySelector("#designation_here").innerHTML = designation
-				document.querySelector("#receive_designation").value = designation	
+			document.addEventListener("DOMContentLoaded", getSuperUserDesignation);
+			function getSuperUserDesignation(){
+				var superuserdesignation = localStorage.getItem("superuserdesignation")
+				document.querySelector("#designation_here").innerHTML = superuserdesignation
+				document.querySelector("#receive_designation").value = superuserdesignation	
 			}	
 		</script>
+
+		<!-- WE ARE CURRENTLY NOT USING THIS FUNCTION ON THIS PARTICULAR PAGE -->
 		<script type="text/javascript">
-			function sendEmailOrPhoneForDifferentQueries(){
-				var email_or_phone = document.querySelector("#email_or_phone").value
-				localStorage.setItem("email_Or_Phone", email_or_phone);
+			function sendSuperUserEmailOrPhone(){
+				var superuser_email_or_phone = document.querySelector("#email_or_phone").value
+				localStorage.setItem("superuser_email_or_phone", superuser_email_or_phone);
 			}
 		</script>
 </head>
 
 <body>
-    <!-- <div class="topnav" id="myTopnav">
-		<a href="/enter" >Enter Student Record</a>
-		<a href="/payfees">Pay Mess Fee</a>
-		<a href="/paydue">Pay Due</a>
-		<a href="/transaction">Transactions</a>
-		<a href="/students">Student Records</a>
-		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
-			<i class="fa fa-bars"></i>
-		</a>
-	</div> -->
 
     <div class="wrapper">
         <div class="title">
@@ -71,18 +63,10 @@
 		{% endwith %}
 
         <div class="form">
-			<!-- {% with messages = get_flashed_messages() %}
-				{% if messages %}
-					{% for message in messages %}
-					<script>
-						swal("{{ message }}", "Thank you!", "success");
-					</script>
-					{% endfor %}
-				{% endif %}
-			{% endwith %} -->
+			
 			<h1>Enter Your Details</h1>
             
-            <form action="/newlogin" method="POST">
+            <form action="/newsuperuserlogin" method="POST">
             	
 				<div>
 					<input id="email_or_phone" type="text" name="EPhone" placeholder="Enter Email or Phone Number" required><br>
@@ -93,18 +77,16 @@
 				</div>
 
 				<div>
-					 <input id = "receive_designation"  name="Designation" readonly>
+					 <input id = "receive_designation" type="hidden" name="Designation" readonly>
 				</div>
 
 				<div class="login-btn">
-					<button onclick="sendEmailOrPhoneForDifferentQueries()">Login</button>
-				</div>
-				<div class="forgot-link">
-					<h4><a href="/updatepass">Forgot Password?</a></h4>
+					<button type="submit" onclick="sendSuperUserEmailOrPhone()">Login</button>
 				</div>
 
+				<!-- USING CSS STYLING OF CLASS new-account--DON'T EDIT! -->
 				<div class="new-account">
-					<h4>Don't have an Account yet? <a href="/signup">Signup Here</a></h4>
+					<h4>Forgot Password? <a href="/resetpasswordsuperuser">Click Here</a></h4>
 				</div>
 
             </form>

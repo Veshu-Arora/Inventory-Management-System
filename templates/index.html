@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Welcome</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'main.css') }}">
 
-	<!-- <script>
-		function myFunction() {
-		  var x = document.getElementById("myTopnav");
-		  if (x.className === "topnav") {
-			x.className += " responsive";
-		  } else {
-			x.className = "topnav";
-		  }
-		}
-	</script> -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
+	<link rel="stylesheet" type="text/css" href="../static/landingpage.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,600&display=swap" rel="stylesheet">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css">
+
+	<title>Welcome</title>
+
+	<!-- THESE ARE IMPORTANT SCRIPT TAGS THAT SENDS THE USER AND SUPERUSER DESIGNATION -->
 
 	<script type="text/javascript">
+		
 		function sendDesignation(des){
 			var designation = des;
 			localStorage.setItem("designation", designation);
@@ -24,132 +25,350 @@
 			return false;
 		}
 
-		function openLoginPageWithDesignation(des){
-			var designation = des;
-			localStorage.setItem("designation", designation);
-			window.document.location = './login';
+		function sendSuperUserDesignation(des){
+			var superuserdesignation = des;
+			localStorage.setItem("superuserdesignation", superuserdesignation);
+			window.document.location = './superuserlogin';
 			return false;
+		}
+
+
+		function sendEmailOrPhoneForDifferentQueries(){
+			var email_or_phone = document.querySelector("#email_or_phone").value
+			localStorage.setItem("email_Or_Phone", email_or_phone);
+		}	
+
+		function sendEmailOrPhoneForDifferentQueriesFormPopup(){
+			var popup_form_email_or_phone = document.querySelector("#popup_form_email_or_phone").value
+			localStorage.setItem("popup_form_email_Or_Phone", popup_form_email_or_phone);
+		}
+
+	</script>
+
+	<!-- THESE <script> TAGS DEFINE THE FUNCTIONS FOR OPENIG AND CLOSING SIGNUP FORM -->
+
+	<script>
+		function openForm() {
+		  document.getElementById("myForm").style.display = "block";
+		}
+
+		function closeForm() {
+		  document.getElementById("myForm").style.display = "none";
+		}
+
+		function openSuperUserLoginForm() {
+		  document.getElementById("superUserLoginForm").style.display = "block";
+		}
+
+		function closeSuperUserLoginForm() {
+		  document.getElementById("superUserLoginForm").style.display = "none";
+		}
+
+		function openGeneralUserLoginFormPopup(){
+			document.getElementById("generalUserLoginFormPopup").style.display = "block";
+		}
+
+		function closeGeneralUserLoginFormPopup(){
+			document.getElementById("generalUserLoginFormPopup").style.display = "none";
 		}
 	</script>
 
+	<script>
+		function openNav() {
+		  document.getElementById("mySidenav").style.width = "230px";
+		}
+
+		function closeNav() {
+		  document.getElementById("mySidenav").style.width = "0";
+		}
+	</script>
+
+
+	<script>
+		function showSignupDropdownMenu() {
+
+			var signupDropdownMenu = document.querySelector(".signup-dropdown-menu");
+	 		
+			if(window.getComputedStyle(signupDropdownMenu).display === "none")
+			{
+				signupDropdownMenu.style.display = "block";
+			}
+
+			else if(window.getComputedStyle(signupDropdownMenu).display === 'block')
+			{
+				signupDropdownMenu.style.display = 'none';
+			}
+			
+		}
+
+		function showSuperuserDropdownMenu(){
+
+			var superuserDropdownMenu = document.querySelector(".superuser-dropdown-menu");
+	 		
+			if(window.getComputedStyle(superuserDropdownMenu).display === "none")
+			{
+				superuserDropdownMenu.style.display = "block";
+			}
+
+			else if(window.getComputedStyle(superuserDropdownMenu).display === 'block')
+			{
+				superuserDropdownMenu.style.display = 'none';
+			}
+
+		}
+
+	</script>
+ 
 </head>
+
+<!-- {% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<script>
+	swal("{{ message }}", "",'{{alert_type}}' );
+</script>
+
+{% endfor %}
+{% endif %}
+{% endwith %} -->
+
 <body>
 
-	<div class="topnav" id="myTopnav">
-		<h2>Inventory  Management  System</h2>
-		<!-- <a href="/enter" >Enter Student Record</a>
-		<a href="/payfees">Pay Mess Fee</a>
-		<a href="/paydue">Pay Due</a>
-		<a href="/transaction">Transactions</a>
-		<a href="/students">Student Records</a>
-		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
-			<i class="fa fa-bars"></i>
-		</a> -->
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+	<script>
+		swal("{{ message }}", "",'{{alert_type}}' );
+	</script>
+
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+
+  <!-- THIS IS THE CODE FOR THE SIDE MENU THAT APPEARS IN THE MOBILE VIEW -->
+
+	<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+		<div>
+			<div class="signup-dropdown" style="display: flex;" onclick="showSignupDropdownMenu()">
+				<a class="signup-dropdown-link" href="#">Signup</a>
+				<i style="background-color: transparent; margin-left: 71px; margin-top: 15px; color: white;" class="fa fa-caret-down"></i>
+		    </div>
+
+			<div class="signup-dropdown-menu">
+				<a href="#" onclick="sendDesignation('Faculty')">Faculty</a>
+				<a href="#" onclick="sendDesignation('Lab Assistant')">Lab Assistant</a>
+				<a href="#" onclick="sendDesignation('Clerk')">Clerk</a>
+				<a href="#" onclick="sendDesignation('Sweeper')">Sweeper</a>
+			</div>
+
+		</div>
+
+		<div>
+
+		    <div class="superuser-dropdown" style="display: flex;" onclick="showSuperuserDropdownMenu()">
+				<a class="superuser-dropdown-link" href="#">Superuser</a>
+				<i style="background-color: transparent; margin-left: 42px; margin-top: 15px; color: white;" class="fa fa-caret-down"></i>
+			</div>
+
+			<div class="superuser-dropdown-menu">
+				<a href="#" onclick="sendSuperUserDesignation('Head')">Head</a>
+				<a href="#" onclick="sendSuperUserDesignation('Store Manager')">Store Manager</a>
+				<a href="#" onclick="sendSuperUserDesignation('Admin')">Admin</a>
+			</div>
+
+		</div>	
 	</div>
 
-	<div class="container">
+  <!-- CODE FOR THE SIDE MENU THAT APPEARS IN THE MOBILE VIEW ENDS HERE -->
+
+
+	<div class="hidden-navigation-bar"> 
+
+		<span style="font-size: 23px;cursor:pointer; background-color: transparent; " onclick="openNav()">
+		&#9776; </span>
+		<span style="color: white; font-size: 20px;" onclick="openGeneralUserLoginFormPopup()">Sign in <img src="../static/usericons/user.svg" style="width: 20px; height: 20px;margin-top: 2px;"> </span>
+
+	</div>
+
+	<div class= "navigation-bar">
+		<div class="logo">
+			<div style="width: 205px;height: 48px;">
+				<img width="100%" height="100%" src='../static/landingpageimages/logo.svg' class="logo-name">
+			</div>
+		</div>
+		<div class="btn-signup">
+			<button onclick="openForm()">SIGNUP</button>
+		</div>
+		<div class="btn-superuser">
+			<button onclick="openSuperUserLoginForm()">SUPER USER</button>
+		</div>
+	</div>
+
+	<div class="main-body">
+
+		<div class="mobile-app-and-login">
+
+			<div class="mobile-app">
+				<div class="mobile-svg-division">
+					<img class="mobile-svg" src='../static/landingpageimages/mobile-app.svg'>
+				</div>
+			</div>
+
+			<div class="form-login-division">
+				<form action="/newlogin" method="POST">
+
+					<input id="email_or_phone" type="text" name="EPhone" placeholder="Email or Phone" required>
+					<input type="password" name="Password" placeholder="Password" required>
+					<a href="/resetpassworduser" style="text-decoration: none;"><h5 class="forgot-password">Forgot Password ?</h5></a>
+					<center>
+						<button onclick="sendEmailOrPhoneForDifferentQueries()">Login</button>
+					</center>
+
+				</form>
+			</div>
+
+		</div>
+
+		<div class="smarter-way-and-deliveries">
+
+			<div class="smarter-way-division">
+				<p class="smarter-way-text">The smarter way <br> to manage your <br> </b> Inventory</p>
+			</div>
+
+			<div class="deliveries-outer-division">
+				<div class="deliveries-inner-division">
+					<img  class="deliveries-image" src='../static/landingpageimages/deliveries-final.svg' >
+				</div>
+			</div>
+
+		</div>
 		
-		<div class="signup">
-			<div class="for-align">
-				<div>
-					<h3>Signup As:</h3>
-				</div>
-				<div class="icons">
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="sendDesignation('Faculty')"></a>
-						<label class="label" id = 'faculty'>Faculty</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="sendDesignation('Lab Assistant')"></a>
-						<label class="label" id = 'lab-assistant'>Lab Assistant</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="sendDesignation('Clerk')"></a>
-						<label class="label" id = 'clerk'>Clerk</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="sendDesignation('Sweeper')"></a>
-						<label class="label" id = 'sweeper'>Sweeper</label>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="signup">
-			<div class="for-align">
-				<div>
-					<h3>Login As:</h3>
-				</div>
-				<div class="icons">
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="openLoginPageWithDesignation('Faculty')"></a>
-						<label class="label" id = 'faculty'>Faculty</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="openLoginPageWithDesignation('Lab Assistant')"></a>
-						<label class="label" id = 'lab-assistant'>Lab Assistant</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="openLoginPageWithDesignation('Clerk')"></a>
-						<label class="label" id = 'clerk'>Clerk</label>
-					</div>
-					<div class="image">
-						<a href="#"><img src="https://via.placeholder.com/1500" 
-							onclick="openLoginPageWithDesignation('Sweeper')"></a>
-						<label class="label" id = 'sweeper'>Sweeper</label>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="info" style="background-color: #495057">		
-		<!-- <div class="info" style="background-color: #131A22"> -->
- 		<!-- <div class="info" style="background-color: #232F3E"> -->
-			<p align="center">ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-			tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-			quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-			consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-			cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-			proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-		</div>
-
-		<div class="footer" style="background-color: #333">
-<!-- 		<div class="footer" style="background-color: #131A22">
- -->			<span>Copyright &copy; 2020 DoIT, HNBGU</span>
-		</div>
-
 	</div>
+
+	<div class="copyright-image">
+		Copyright &copy; easyi.in
+	</div>
+
+	<!-- THIS REGISTRATION FORM WILL OPEN WHEN USER HAS TO SIGNUP -->
+
+	<div class="form-popup animate__bounceIn" id="myForm" style="z-index: 1; ">
+	    <form action="/action_page.php" class="form-container">
+	    
+	    	<h2>Signup As:</h2>
+
+		    <div class="icons">
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Faculty-New-Down.svg" 
+							onclick="sendDesignation('Faculty')"></a> <br>
+					</div>	
+					<label class="label" id = 'faculty'>Faculty</label>
+				</div>
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Labassistant-New.svg" 
+							onclick="sendDesignation('Lab Assistant')"></a> <br>
+					</div>		
+					<label class="label" id = 'lab-assistant'>Lab Assistant</label>
+				</div>
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Clerk-New-Up.svg" 
+							onclick="sendDesignation('Clerk')"></a> <br>
+					</div>		
+					<label class="label" id = 'clerk'>Clerk</label>
+				</div>
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Sweeper-New-Up.svg" 
+							onclick="sendDesignation('Sweeper')"></a> <br>
+					</div>		
+					<label class="label" id = 'sweeper'>Sweeper</label>
+				</div>
+
+			</div>
+
+			<div class="btn-close">
+		    	<button type="button" onclick="closeForm()">Close</button>
+		    </div>
+	    </form>
+	</div>
+
+	<!-- THIS LOGIN FORM WILL OPEN WHEN SUPER USER HAS TO LOGIN -->
+
+	<div class="form-popup animate__bounceIn" id="superUserLoginForm" style="z-index: 1">
+	    <form action="/action_page.php" class="form-container">
+	    
+	    	<h2>Login As:</h2>
+
+		    <div class="icons">
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Head-New.svg" 
+							onclick="sendSuperUserDesignation('Head')"></a> <br>
+					</div>		
+					<label class="label" id = 'head'>Head</label>
+				</div>
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Storemanager-New.svg" 
+							onclick="sendSuperUserDesignation('Store Manager')"></a> <br>
+					</div>		
+					<label class="label" id = 'store manager'>Store Manager</label>
+				</div>
+
+				<div>
+					<div class="image-immediate-parent">
+						<a href="#"><img src="../static/landingpageicons/Admin-New-1.svg" 
+							onclick="sendSuperUserDesignation('Admin')"></a> <br>
+					</div>		
+					<label class="label" id = 'admin'>Admin</label>
+				</div>
+
+			</div>
+
+			<div class="btn-close">
+		    	<button type="button" onclick="closeSuperUserLoginForm()">Close</button>
+		    </div>
+	    </form>
+	</div>
+
+    <div class="line"></div>
+
+    <div class="mobile-login-form-popup animate__bounceIn" id="generalUserLoginFormPopup" >
+	    <div class="popup-form-container">
+	    
+	    	<h2>Login</h2>
+
+		   	<div class="popup-form-login-division">
+				<form action="/newlogin" method="POST" style="text-align: center;">
+
+					<input id="popup_form_email_or_phone" type="text" name="EPhone" placeholder="Email or Phone" required>
+					<input type="password" name="Password" placeholder="Password" required>
+					<a href="/resetpassworduser" style="text-decoration: none;"><h5 class="popup-form-forgot-password">Forgot Password ?</h5>
+					</a>
+					<center>
+						<button onclick="sendEmailOrPhoneForDifferentQueriesFormPopup()">Login</button>
+					</center>
+
+				</form>
+			</div>
+
+			<div class="form-popup-btn-close" id="generalUserLoginFormCloseButonDivision" style="margin-top: 5px; padding-right: 2px;">
+		    	<button type="button" onclick="closeGeneralUserLoginFormPopup()">Close</button>
+		    </div>
+	    </div>
+	</div>
+
 </body>
+
+
 </html>
