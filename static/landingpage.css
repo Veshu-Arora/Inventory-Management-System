@@ -6,8 +6,12 @@
     position: fixed;
     top:22%;
     left:28%;
-    border: 2px solid #FF5F6D;
-    border-radius: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+
+    -webkit-box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
+	-moz-box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
+	box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
 }
 
 /* NEW CSS FOR THE POPUP LOGIN FORM */
@@ -17,10 +21,14 @@
     position: fixed;
     top:24%;
     left:28%;
-    border: 2px solid #FF5F6D;
-    border-radius: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
     left: 8%;
     right: 8%;
+
+    -webkit-box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
+	-moz-box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
+	box-shadow: 10px 10px 50px -30px rgba(0,0,0,1);
 }
 
 
@@ -195,6 +203,7 @@ body{
 
 .btn-superuser button:hover{
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
@@ -203,6 +212,7 @@ body{
 
 .btn-signup button:hover {
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
@@ -261,6 +271,7 @@ body{
 	/* GIVING HOVER PROPERTIES TO CLOSE BUTTON BY DEFAULT TO DISTINGUISH IT FROM LOGIN BUTTON */
 
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
@@ -268,15 +279,18 @@ body{
 
 .form-popup .btn-close button:hover{
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
+
 }	
 
 /* NEW CSS FOR THE POPUP LOGIN FORM */
 
 .mobile-login-form-popup .form-popup-btn-close button:hover{
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
@@ -361,12 +375,12 @@ body{
 	margin-top: 16px; 
 	width: 110px; 
 	height: 30px; 
-	background: #FF5F6D;
-	border: 1px solid #FF5F6D; 
+	background: #FF5F6D; 
 	border-radius: 5px; 
 	color: white;
 	border-color: transparent;
 	outline: none;
+
 }
 
 /* NEW CSS FOR THE POPUP LOGIN FORM */
@@ -375,8 +389,7 @@ body{
 	margin-top: 16px; 
 	width: 100px; 
 	height: 31px; 
-	background: #FF5F6D;
-	border: 1px solid #FF5F6D; 
+	background: #FF5F6D; 
 	border-radius: 5px; 
 	color: white;
 	border-color: transparent;
@@ -384,16 +397,20 @@ body{
 }
 
 .main-body .form-login-division button:hover {
+
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
+
 }	
 
 /* NEW CSS FOR THE POPUP LOGIN FORM */
 
 .mobile-login-form-popup .popup-form-login-division button:hover{
 	border-color: #FF5F6D; 
+	border-width: 1.3px;
 	background-color: white;
 	color: #FF5F6D; 
 	outline: #FF5F6D;
@@ -454,7 +471,7 @@ body{
 	position:absolute;
 	top:23%;
 	left:50%;
-	height: 232px;
+	height: 230px;
 	width: 0px;
 	border: 2px solid #FF5F6D;
 }

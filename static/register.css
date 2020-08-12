@@ -13,12 +13,6 @@
 }
 
 
-.topnav a:hover{
-	text-decoration: underline;
-}
-
-
-
 @media screen and (max-width: 600px){
 	.container .icons label{
 		display: block;
@@ -39,9 +33,11 @@
 	margin: 6px 6px 0px 0px;
 }
 
-/*#bar{
-	background-color: #333;
-}*/
+#bar-container{
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .container {
   display: inline-block;
   cursor: pointer;
@@ -72,7 +68,8 @@
 
 .topnav {
 	overflow: hidden;
-	background-color: #333;
+	background-color: #FF5F6D;
+	filter: contrast(95%);
 }
 
 .topnav .topnav-right {
@@ -82,7 +79,7 @@
 .topnav a {
 	float: left;
 	display: block;
-	color: #f2f2f2;
+	color: white;
 	text-align: center;
 	padding: 14px 16px;
 	text-decoration: none;
@@ -90,9 +87,12 @@
 }
  
 .topnav a:hover {
-	background-color:black;
-	color: #f2f2f2;
+	text-decoration: underline;
+	background-color: #ff3849;
+	/*filter: contrast(95%);*/
+	color: white;
 }
+	
 
 #bar:hover{
 	background-color: transparent;
@@ -198,15 +198,15 @@
 	padding: 4px;
 	width: 100%;
 	margin-top: 10px;
-	border-radius: 5px;
+	border-radius: 3px;
 	outline: none;
-	border: 2px solid #333;
+	border: 1px solid #FF5F6D;
 }
 
 .form .cat-box{
 	margin-top: 10px;
-	border: 2px solid #333;
-	border-radius: 5px;
+	border: 1px solid #ff5f6d;
+	border-radius: 3px;
 	padding: 4px;
 }
 
@@ -214,9 +214,9 @@
 	padding: 4px;
 	width: 100%;
 	margin-top: 10px;
-	border-radius: 5px;
+	border-radius: 3px;
 	outline: none;
-	border: 2px solid #333;
+	border: 1px solid #FF5F6D;
 }
 
 
@@ -254,20 +254,27 @@
 }*/
 
 .form .generate-code-btn button{
-	border-radius: 10px;
+	border-radius: 3px;
 	margin-top: 12px;
 	width: auto;
-	background-color: #696969;
+	background-color: #FF5F6D;
+	border: 1px solid #FF5F6D;
 	color: white;
 	padding:2px 15px 2px 15px;
 	outline: none;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.form .generate-code-btn button:active{
+	transform: scale(0.98);
+	box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.15);
 }
 
 .form h1{
 	font-size: 23px;
 	margin-top: 23vh;
 	text-align: center;
-	color: #696969;
+	color: #FF5F6D;
 }
 
 .form .name{
@@ -294,13 +301,20 @@
 }
 
 .form .signup-btn button, .form .login-btn button, .form .add-btn button{
-	border-radius: 10px;
-	/*padding: 4px;*/
+	border-radius: 5px;
 	width: auto;
-	background-color: #696969;
+	background-color: #FF5F6D;
 	color: white;
 	padding:2px 15px 2px 15px;
 	outline: none;
+	/*border-color: #FF5F6D;*/
+	border: 1.3px solid #FF5F6D;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.form .signup-btn button:active, .form .login-btn button:active, .form .add-btn button:active{
+	transform: scale(0.98);
+	box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.10);
 }
 
 .form .login-btn{
@@ -326,8 +340,12 @@
 }
 
 .form .new-account a, .form .pre-account a{
-	color: #000;
+	color: #FF5F6D;
 	text-decoration: none;
+}
+
+.form .new-account a:hover, .form .pre-account a:hover{
+	text-decoration: underline;
 }
 
 
@@ -342,8 +360,16 @@
 	color: white;
 	outline: none;
 	margin-top: 10px;
-	border-radius: 10px;
-	background-color: #696969;
+	border-radius: 5px;
+	background-color: #FF5F6D;
+	/*border-color: #FF5F6D;*/
+	border: 1.3px solid #FF5F6D;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.form .updatepass-btn button:active{
+	transform: scale(0.98);
+	box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.10);
 }
 
 /*.form form button{
@@ -406,7 +432,7 @@ form .name div{
 
 .wrapper .title{
 	padding-top:80px;
-    background: #696969;
+    background: #FF5F6D;
     color:white;
     font-size:80px;
 	text-align:left;
@@ -426,7 +452,7 @@ form .name div{
     }
     
     .wrapper .title{
-    background: #696969;
+    /*background: #696969;*/
     color:white;
     padding-top:35px;
     font-size:25px;
@@ -474,6 +500,24 @@ form .name div{
 
 /* Full-width input fields */
 .form-container input[type=text] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 12.5px 0;
+    border: none;
+    background: #f1f1f1;
+}
+
+/* THIS CSS IS FOR THE NUMBER FIELD IN WHICH USER WILL ENTER THE REQUIRED QUANTITY */
+.form-container #requested_qty {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 12.5px 0;
+    border: none;
+    background: #f1f1f1;
+}
+
+/* THIS CSS IS FOR THE NUMBER FIELD IN WHICH HEAD WILL SPECIFY THE MAX. ISSUABLE QUANTITY */
+.form-container #max_issuable_qty {
     width: 100%;
     padding: 15px;
     margin: 5px 0 12.5px 0;
